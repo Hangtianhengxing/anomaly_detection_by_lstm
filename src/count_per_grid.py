@@ -42,7 +42,7 @@ def main(cordinate_dp, grid_num=(5,4)):
         grid_num:    (col, row), default value is (5, 4)
 
     index of grid:
-        ex) grind_num=(3, 2)
+        ex) grid_num=(3, 2)
                         row
                 -------------------------
                 |   0   |   1   |   2   |
