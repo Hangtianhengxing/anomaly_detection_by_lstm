@@ -54,6 +54,7 @@ def main(cordinate_dp, grid_num=(5,4)):
     file_lst = glob.glob(cordinate_dp + "*.npy")
     if len(file_lst) == 0:
         sys.stderr.write("Error: not found cordinate file(.npy)")
+        sys.exit(1)
     else:
         pass
 
