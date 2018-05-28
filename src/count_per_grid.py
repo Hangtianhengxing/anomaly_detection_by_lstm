@@ -40,6 +40,7 @@ def main(cordinate_dp, grid_num=(5,4)):
     input:
         cordinate_dp: directory path (codinate of target (.npy))
         grid_num:    (col, row), default value is (5, 4)
+<<<<<<< HEAD
 
     index of grid:
         ex) grind_num=(3, 2)
@@ -49,6 +50,8 @@ def main(cordinate_dp, grid_num=(5,4)):
          col    -------------------------
                 |   3   |   4   |   5   |
                 -------------------------
+=======
+>>>>>>> c24347cf2be6e4d517cd42be563e59a4041ab6e2
     """
 
     file_lst = glob.glob(cordinate_dp + "*.npy")
