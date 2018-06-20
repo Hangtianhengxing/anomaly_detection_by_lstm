@@ -94,9 +94,11 @@ def plot(value_lst, info_dict, output_path):
         valueXLimMin = valueX[0]
         valueXLimMax = valueX[-1]
         valueYLimMin = 0
-        valueYLimMax = 25
+        valueYLimMax = 1.0
         plt.xlim(valueXLimMin, valueXLimMax)
         plt.ylim(valueYLimMin, valueYLimMax)
+        plt.xticks(np.arange(0,valueXLimMax+1,30), np.arange(0,int(valueXLimMax+1/30),1)) #30 is fps
+        plt.yticks(np.arange(0,1.1,0.1))
         plt.rcParams["font.size"] = 50
         plt.grid(True)
         plt.plot(valueX, value_lst)
@@ -115,8 +117,8 @@ def plot(value_lst, info_dict, output_path):
 def main(cordinate_dp, grid_num):
     grid_df = count_per_grid(cordinate_dp, grid_num)
     grid_df.to_csv("../data/output/{}_grid_count.csv".format(cordinate_dp.split("/")[-2]), index=False)
-    info_dict = {"title":"max number of feature points", "xlabel":"frame number", "ylabel":"feature number"}
-    plot(list(grid_df["max"]), info_dict, "../data/output/1min_max.png")
+    info_dict = {"title":"occupancy of feature points", "xlabel":"frame number", "ylabel":"occupancy [%]"}
+    plot(list(grid_df["max"]/grid_df["sum"]), info_dict, "../data/output/1min_grid.png")
 
 if __name__ == "__main__":
     args = sys.argv
