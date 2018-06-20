@@ -69,9 +69,17 @@ def main(cordinate_dp, grid_num=(5,4)):
         for key, value in count_dict.items():
             grid_dictlst[key].append(value)
 
-    pd.DataFrame(grid_dictlst).to_csv("../data/output/{}_grid_count.csv".format(cordinate_dp.split("/")[-2]))
+    grid_df = pd.DataFrame(grid_dictlst)
+    sum_series = grid_df.sum(axis=1)
+    max_series = grid_df.max(axis=1)
+    idxmax_series = grid_df.idxmax(axis=1)
+    grid_df["sum"] = sum_series
+    grid_df["max"] = max_series
+    grid_df["max_index"] = idxmax_series
+    grid_df.to_csv("../data/output/{}_grid_count.csv".format(cordinate_dp.split("/")[-2]), index=False)
 
 
 if __name__ == "__main__":
+
     args = sys.argv
-    main(args[1], grid_num=(5, 4))
+    main(args[1], grid_num=(5, 1))
