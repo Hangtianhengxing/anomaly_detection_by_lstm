@@ -33,7 +33,7 @@ def count_gird(cordinate_df, grid_num):
 
 
 
-def main(cordinate_dp, grid_num=(5,4)):
+def main(cordinate_dp, grid_num=(5,1)):
     """
     save data that counted oubject per grid
 
@@ -82,4 +82,4 @@ def main(cordinate_dp, grid_num=(5,4)):
 if __name__ == "__main__":
 
     args = sys.argv
-    main(args[1], grid_num=(5, 1))
+    main(args[1], grid_num=(5,1))
