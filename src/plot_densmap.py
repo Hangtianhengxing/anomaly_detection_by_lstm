@@ -4,9 +4,7 @@
 import numpy as np 
 import pandas as pd
 import matplotlib
-import os
-if "DISPLAY" is not in os.environ:
-    matplotlib.use("Agg")
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 import glob
@@ -65,7 +63,7 @@ def gausian_kernel(ord_dircpath, save_filepath, sigma_pow=25):
 
 
 if __name__ == "__main__":
-    cord_dircpath = "../data/20170421/11/"
+    cord_dircpath = "/data/sakka/estimation/20170421/11/cord/"
     save_filepath = "../data/20170421/map/11.png"
     #plot_kde(cord_dircpath, save_filepath, bw=15)
     gausian_kernel(cord_dircpath, save_filepath, sigma_pow=25)
