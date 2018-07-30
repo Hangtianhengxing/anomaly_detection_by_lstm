@@ -1,9 +1,12 @@
 #! /usr/bin/env python
 #coding: utf-8
 
-
 import numpy as np 
 import pandas as pd
+import matplotlib
+import os
+if "DISPLAY" is not in os.environ:
+    matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 import glob
@@ -24,7 +27,7 @@ def total_cord(cord_dircpath):
     return cord_dictlst
 
 
-def plot_densmap(cord_dircpath, save_filepath, bw=15):
+def plot_kde(cord_dircpath, save_filepath, bw=15):
     cord_dictlst = total_cord(cord_dircpath)
 
     print("NOW: plot density map")
@@ -64,5 +67,5 @@ def gausian_kernel(ord_dircpath, save_filepath, sigma_pow=25):
 if __name__ == "__main__":
     cord_dircpath = "../data/20170421/11/"
     save_filepath = "../data/20170421/map/11.png"
-    #plot_densmap(cord_dircpath, save_filepath, bw=15)
+    #plot_kde(cord_dircpath, save_filepath, bw=15)
     gausian_kernel(cord_dircpath, save_filepath, sigma_pow=25)
