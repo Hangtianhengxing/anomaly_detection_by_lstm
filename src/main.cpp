@@ -28,5 +28,10 @@ int main(int argc, char **argv) {
     std::cin >> output_file_path;
 
     human_area(input_file_path, human_mask_path, output_file_path);
+    
+    // display calculation time
+    end = std::chrono::system_clock::now();
+    double elapsed = std::chrono::duration_cast <std::chrono::seconds> (end - start).count();
+    std::cout << "Calcuration time: " << elapsed << std::endl;
 
 }

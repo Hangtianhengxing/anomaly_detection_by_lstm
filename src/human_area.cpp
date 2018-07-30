@@ -90,7 +90,7 @@ void human_area(std::string input_file_path, std::string human_mask_path, std::s
         if (frame.empty()) break;
         
         frame_num++;
-        if (frame_num%100==0) {
+        if (frame_num%1000==0) {
             std::cout << "Frame number: " << frame_num << "/" << total_frame << std::endl;
         }
 
