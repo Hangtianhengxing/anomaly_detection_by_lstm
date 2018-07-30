@@ -8,4 +8,6 @@
 !.gitignore
 !*.py
 !*.md
+!*.cpp
+!Makefile
 
