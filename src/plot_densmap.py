@@ -54,11 +54,12 @@ def gausian_kernel(ord_dircpath, save_filepath, sigma_pow=25):
         tmp_cord_matrix = np.array(cordinate_matrix)
         x = cord_dictlst["x"][i]
         y = cord_dictlst["y"][i]
-        point_matrix = np.full((720, 1280, 2), [y, x])
-        diff_matrix = tmp_cord_matrix - point_matrix
-        pow_matrix = diff_matrix * diff_matrix
-        norm = pow_matrix[:, :, 0] + pow_matrix[:, :, 1]
-        kernel += np.exp(-norm/ (2 * sigma_pow))
+        if (x not in remove_x) and (y not in remove_y):
+            point_matrix = np.full((720, 1280, 2), [y, x])
+            diff_matrix = tmp_cord_matrix - point_matrix
+            pow_matrix = diff_matrix * diff_matrix
+            norm = pow_matrix[:, :, 0] + pow_matrix[:, :, 1]
+            kernel += np.exp(-norm/ (2 * sigma_pow))
 
     plt.imshow(kernel)
     plt.savefig(save_filepath)
