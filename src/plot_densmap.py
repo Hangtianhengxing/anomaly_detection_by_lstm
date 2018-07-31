@@ -45,6 +45,10 @@ def gausian_kernel(ord_dircpath, save_filepath, sigma_pow=25):
         for x in range(1280):
             cordinate_matrix[y][x] = [y, x]
 
+    # NEEDFIX: remove range
+    remove_x = np.linspace(0,349,350)
+    remove_y = np.linspace(0,99,100)
+
     kernel = np.zeros((720, 1280))
     for i in trange(len(cord_dictlst["x"])):
         tmp_cord_matrix = np.array(cordinate_matrix)
