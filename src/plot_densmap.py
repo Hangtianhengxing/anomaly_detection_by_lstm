@@ -16,7 +16,8 @@ def total_cord(cord_dircpath):
 
     cord_dictlst = {"x":[], "y":[]}
     for path in tqdm(cord_file_lst):
-        cord_arr = np.loadtxt(path, delimiter=",")
+        cord_arr = np.loadtxt(path, delimiter=",", dtype="int32")
+        cord_arr = cord_arr[~((cord_arr[:, 0] < 400) * (cord_arr[:, 1] < 100))]
         cord_dictlst["x"].extend(cord_arr[:,0])
         cord_dictlst["y"].extend(cord_arr[:, 1])
         
@@ -68,7 +69,7 @@ def gausian_kernel(ord_dircpath, save_filepath, sigma_pow=25):
 
 
 if __name__ == "__main__":
-    cord_dircpath = "/data/sakka/estimation/20170421/11/cord/"
+    cord_dircpath = "/Users/sakka/cnn_anomaly_detection/data/cord/1min/"
     save_filepath = "../data/20170421/map/11.png"
-    #plot_kde(cord_dircpath, save_filepath, bw=15)
-    gausian_kernel(cord_dircpath, save_filepath, sigma_pow=25)
+    plot_kde(cord_dircpath, save_filepath, bw=15)
+    #gausian_kernel(cord_dircpath, save_filepath, sigma_pow=5)
