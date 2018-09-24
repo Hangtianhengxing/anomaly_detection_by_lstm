@@ -68,14 +68,7 @@ void human_area(std::string input_file_path, std::string human_mask_path, std::s
     }
 
     // display information of input file
-    std::cout << "\n*******************************************" << std::endl;
-    std::cout << "MOVIE PATH: " << input_file_path << std::endl;
-    std::cout << "WIDTH: " << width << std::endl;
-    std::cout << "HEIGHT: " << height << std::endl;
-    std::cout << "TOTAL FRAME: " << total_frame << std::endl;
-    std::cout << "FOURCC: " << fourcc << std::endl;
-    std::cout << "FPS: " << fps << std::endl;
-    std::cout << "*******************************************\n" << std::endl;
+    display_info(input_file_path, width, height, total_frame, fourcc, fps);
 
     // initializetion
     cv::Mat frame, gray_frame;
