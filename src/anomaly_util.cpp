@@ -14,7 +14,19 @@
 #include <opencv2/imgcodecs.hpp>
 
 
-cv::Mat read_mask(std::string mask_path, bool binary=false) {
+void display_info(std::string input_file_path, int width, int height, int total_frame, int fourcc, double fps){
+    // display information of input file
+    std::cout << "\n*******************************************" << std::endl;
+    std::cout << "MOVIE PATH: " << input_file_path << std::endl;
+    std::cout << "WIDTH: " << width << std::endl;
+    std::cout << "HEIGHT: " << height << std::endl;
+    std::cout << "TOTAL FRAME: " << total_frame << std::endl;
+    std::cout << "FOURCC: " << fourcc << std::endl;
+    std::cout << "FPS: " << fps << std::endl;
+    std::cout << "*******************************************\n" << std::endl;
+}
+
+cv::Mat read_mask(std::string mask_path, bool binarization=false) {
     cv::Mat mask = cv::imread(mask_path, CV_LOAD_IMAGE_GRAYSCALE);
     if (mask.empty()) {
         std::cout << "Error: can not open file." << std::endl;
@@ -22,7 +34,7 @@ cv::Mat read_mask(std::string mask_path, bool binary=false) {
         exit(1);
     }
 
-    if (binary) {
+    if (binarization) {
         if (mask.channels() != 1){
             cv::cvtColor(mask, mask, CV_BGR2GRAY);
         }

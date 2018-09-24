@@ -9,8 +9,9 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/imgcodecs.hpp>
 
-extern cv::Mat read_mask(std::string mask_path, bool binary);
-extern void write_csv(std::vector<float> &vec_data, std::string output_csv_file_path);
+extern void display_info(std::string, int, int, int, int, double);
+extern cv::Mat read_mask(std::string, bool);
+extern void write_csv(std::vector<float>&, std::string);
 
 
 float calc_area_ratio(cv::Mat &img, cv::Mat &bin_mask) {

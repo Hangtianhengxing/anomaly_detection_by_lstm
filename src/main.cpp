@@ -10,7 +10,7 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/imgcodecs.hpp>
 
-extern void human_area(std::string input_file_path, std::string human_mask_path, std::string output_file_path);
+extern void human_area(std::string, std::string, std::string);
 
 int main(int argc, char **argv) {
     std::chrono::system_clock::time_point start, end;
