@@ -9,14 +9,18 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/imgcodecs.hpp>
 
-extern void display_info(std::string, int, int, int, int, double);
-extern cv::Mat read_mask(std::string, bool);
-extern void write_csv(std::vector<float>&, std::string);
+using std::cout;
+using std::endl;
+using std::string;
+
+extern void display_info(string, int, int, int, int, double);
+extern cv::Mat read_mask(string, bool);
+extern void write_csv(std::vector<float>&, string);
 
 
 float calc_area_ratio(cv::Mat &img, cv::Mat &bin_mask) {
     if (bin_mask.channels() != 1) {
-        std::cout << "Error: mask is NOT binary!" << std::endl;
+        cout << "Error: mask is NOT binary!" << endl;
         exit(1);
     }
 
@@ -62,8 +66,8 @@ void human_area(std::string input_file_path, std::string human_mask_path, std::s
 
     // end if video can not be read
     if (!capture.isOpened()) {
-        std::cout << "Error: can not open file." << std::endl;
-        std::cout << "PATH: " << input_file_path << std::endl;
+        cout << "Error: can not open file." << endl;
+        cout << "PATH: " << input_file_path << endl;
         exit(1);
     }
 
@@ -85,7 +89,7 @@ void human_area(std::string input_file_path, std::string human_mask_path, std::s
         
         frame_num++;
         if (frame_num%1000==0) {
-            std::cout << "Frame number: " << frame_num << "/" << total_frame << std::endl;
+            cout << "Frame number: " << frame_num << "/" << total_frame << endl;
         }
 
         cv::cvtColor(frame, gray_frame, CV_RGB2GRAY);
@@ -95,6 +99,6 @@ void human_area(std::string input_file_path, std::string human_mask_path, std::s
     cv::destroyAllWindows();
 
     write_csv(human_vec, output_file_path);
-    std::cout << "Done: save human area data." << std::endl;
+    cout << "Done: save human area data." << endl;
 
 }

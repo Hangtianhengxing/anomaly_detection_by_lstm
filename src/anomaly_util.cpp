@@ -13,24 +13,27 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/imgcodecs.hpp>
 
+using std::cout;
+using std::endl;
+using std::string;
 
-void display_info(std::string input_file_path, int width, int height, int total_frame, int fourcc, double fps){
+void display_info(string input_file_path, int width, int height, int total_frame, int fourcc, double fps){
     // display information of input file
-    std::cout << "\n*******************************************" << std::endl;
-    std::cout << "MOVIE PATH: " << input_file_path << std::endl;
-    std::cout << "WIDTH: " << width << std::endl;
-    std::cout << "HEIGHT: " << height << std::endl;
-    std::cout << "TOTAL FRAME: " << total_frame << std::endl;
-    std::cout << "FOURCC: " << fourcc << std::endl;
-    std::cout << "FPS: " << fps << std::endl;
-    std::cout << "*******************************************\n" << std::endl;
+    cout << "\n*******************************************" << endl;
+    cout << "MOVIE PATH: " << input_file_path << endl;
+    cout << "WIDTH: " << width << endl;
+    cout << "HEIGHT: " << height << endl;
+    cout << "TOTAL FRAME: " << total_frame << endl;
+    cout << "FOURCC: " << fourcc << endl;
+    cout << "FPS: " << fps << endl;
+    cout << "*******************************************\n" << endl;
 }
 
-cv::Mat read_mask(std::string mask_path, bool binarization=false) {
+cv::Mat read_mask(string mask_path, bool binarization=false) {
     cv::Mat mask = cv::imread(mask_path, CV_LOAD_IMAGE_GRAYSCALE);
     if (mask.empty()) {
-        std::cout << "Error: can not open file." << std::endl;
-        std::cout << "PATH: " << mask_path << std::endl;
+        cout << "Error: can not open file." << endl;
+        cout << "PATH: " << mask_path << endl;
         exit(1);
     }
 
@@ -44,7 +47,7 @@ cv::Mat read_mask(std::string mask_path, bool binarization=false) {
     return mask;
 }
 
-void read_csv(std::string input_csv_file_path, std::vector<std::vector <int> > &table, const char delimiter = ',') {
+void read_csv(string input_csv_file_path, std::vector<std::vector <int> > &table, const char delimiter = ',') {
     /**
      * to make vector table of csv data
      * 
@@ -55,18 +58,18 @@ void read_csv(std::string input_csv_file_path, std::vector<std::vector <int> > &
     **/
     std::fstream filestream(input_csv_file_path);
     if (!filestream.is_open()) {
-        std::cout << "ERROR: can not open file. please check file path." << std::endl;
-        std::cout << "PATH: " << input_csv_file_path << std::endl;
+        cout << "ERROR: can not open file. please check file path." << endl;
+        cout << "PATH: " << input_csv_file_path << endl;
         exit(1);
     }
 
     while (!filestream.eof()) {
-        std::string buffer;
+        string buffer;
         filestream >> buffer;
 
         std::vector<int> record;
         std::istringstream streambuffer(buffer);
-        std::string token;
+        string token;
         while (getline(streambuffer, token, delimiter)) {
             record.push_back(atoi(token.c_str()));
         }
@@ -76,7 +79,7 @@ void read_csv(std::string input_csv_file_path, std::vector<std::vector <int> > &
 }
 
 
-void write_csv(std::vector<float> &vec_data, std::string output_csv_file_path) {
+void write_csv(std::vector<float> &vec_data, string output_csv_file_path) {
     /**
      * write csv file by vector data
      * 
@@ -92,11 +95,11 @@ void write_csv(std::vector<float> &vec_data, std::string output_csv_file_path) {
         }
     }
     else {
-        std::cout << "ERROR: can not open file. please check file path." << std::endl;
-        std::cout << "PATH: " << output_csv_file_path << std::endl;
+        cout << "ERROR: can not open file. please check file path." << endl;
+        cout << "PATH: " << output_csv_file_path << endl;
         exit(1);
     }
 
     ofs.close();
-    std::cout << "SAVE PATH: " << output_csv_file_path << std::endl;
+    cout << "SAVE PATH: " << output_csv_file_path << endl;
 }
