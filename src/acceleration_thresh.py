@@ -41,6 +41,7 @@ def acceleration_thresh(args):
     under the directory (args.root_stats_dirc).
     threshold data of several directory is saved in following path (input directory path + acc_thresh.csv).
     """
+    
     # get time series directory list under the root directory
     times_lst = os.listdir(args.root_stats_dirc)
     times_lst = [time for time in times_lst if os.path.isdir(args.root_stats_dirc + time)]
