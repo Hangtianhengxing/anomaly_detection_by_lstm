@@ -9,6 +9,18 @@ from tqdm import tqdm
 
 
 def calc_thresh(value_lst, weight, window, min_value, max_value):
+    """
+    calculate the acceleration threshold.
+    thresh = weight*(mean of value_lst)
+    condition: min_value < thresh < max_value
+    input:
+        value_lst: value list of time series
+        weight: weight multiplied mean value
+        window: number of past frames to consider
+        min_value: minimum of threshold
+        max_value: maximum of threshold
+    """
+
     # if past time series data does not exist, zero padding.
     pad_size = window - len(value_lst)
     if pad_size > 0:
@@ -16,7 +28,7 @@ def calc_thresh(value_lst, weight, window, min_value, max_value):
         value_lst = pad_lst + value_lst
     window_mean = weight * np.mean(value_lst[-window:])
 
-    # min_value < thresh < max_value
+    # condition
     thresh = max(window_mean, min_value)
     thresh = min(thresh, max_value)
 
@@ -24,6 +36,11 @@ def calc_thresh(value_lst, weight, window, min_value, max_value):
 
 
 def acceleration_thresh(args):
+    """
+    calculate threshold by statistics value (mean, val, max) of time series 
+    under the directory (args.root_stats_dirc).
+    threshold data of several directory is saved in following path (input directory path + acc_thresh.csv).
+    """
     # get time series directory list under the root directory
     times_lst = os.listdir(args.root_stats_dirc)
     times_lst = [time for time in times_lst if os.path.isdir(args.root_stats_dirc + time)]
