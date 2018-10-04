@@ -19,8 +19,9 @@ logging.basicConfig(filename=logs_path,
                     level=logging.DEBUG,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
+
 def total_cord(cord_dircpath):
-    cord_file_lst = glob.glob(cord_dircpath+"*.csv")
+    cord_file_lst = glob.glob(args.cord_dirc+"*.csv")
 
     cord_dictlst = {"x":[], "y":[]}
     for path in tqdm(cord_file_lst):
@@ -34,19 +35,19 @@ def total_cord(cord_dircpath):
     return cord_dictlst
 
 
-def plot_kde(cord_dircpath, save_filepath, bw=15):
-    cord_dictlst = total_cord(cord_dircpath)
+def plot_kde(args):
+    cord_dictlst = total_cord(args.cord_dirc)
 
-    print("NOW: plot density map")
-    ax = sns.kdeplot(cord_dictlst["x"], cord_dictlst["y"], bw=bw)
+    logger.debug("NOW: plot density map")
+    ax = sns.kdeplot(cord_dictlst["x"], cord_dictlst["y"], bw=args.band_width)
     ax.set_ylim([720, 0])
     ax.set_xlim([0, 1280])
-    plt.savefig(save_filepath)
-    print("SAVE FIG: {}".format(save_filepath))
+    plt.savefig(args.save_path)
+    logger.debug("SAVE FIG: {}".format(args.save_path))
 
 
-def gausian_kernel(ord_dircpath, save_filepath, sigma_pow=25):
-    cord_dictlst = total_cord(cord_dircpath)
+def gausian_kernel(args):
+    cord_dictlst = total_cord(args.cord_dirc)
 
     # init distance matrix
     cordinate_matrix = np.zeros((720, 1280, 2), dtype="int32")
@@ -68,16 +69,38 @@ def gausian_kernel(ord_dircpath, save_filepath, sigma_pow=25):
             diff_matrix = tmp_cord_matrix - point_matrix
             pow_matrix = diff_matrix * diff_matrix
             norm = pow_matrix[:, :, 0] + pow_matrix[:, :, 1]
-            kernel += np.exp(-norm/ (2 * sigma_pow))
+            kernel += np.exp(-norm/ (2 * args.sigma_pow))
 
     plt.imshow(kernel)
-    plt.savefig(save_filepath)
-    print("SAVE FIG: {}".format(save_filepath))
+    plt.savefig(args.save_path)
+    logger.debug("SAVE FIG: {}".format(args.save_path))
 
+
+def densmap_parse():
+    parser = argparse.ArgumentParser(
+        prog="plot_densmap.py",
+        usage="",
+        description="description",
+        epilog="end",
+        add_help=True
+    )
+
+    # Data Argument
+    parser.add_argument("--cord_dirc", type=str,
+                        default="/Users/sakka/cnn_anomaly_detection/data/cord/1min/")
+    parser.add_argument("--save_path", type=str,
+                        default="/Users/sakka/cnn_anomaly_detection/data/20170421/map/11.png")
+
+    # Parameter Argument
+    parser.add_argument("--band_width", type=int, default=15)
+    parser.add_argument("--sigma_pow", type=int, default=25)
+
+    args = parser.parse_args()
+
+    return args
 
 
 if __name__ == "__main__":
-    cord_dircpath = "/Users/sakka/cnn_anomaly_detection/data/cord/1min/"
-    save_filepath = "../data/20170421/map/11.png"
-    plot_kde(cord_dircpath, save_filepath, bw=15)
-    #gausian_kernel(cord_dircpath, save_filepath, sigma_pow=5)
+    args = densmap_parse()
+    plot_kde(args)
+    #gausian_kernel(args)

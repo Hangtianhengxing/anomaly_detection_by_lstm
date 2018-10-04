@@ -16,12 +16,12 @@ logging.basicConfig(filename=logs_path,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 
-def count_per_grid(cordinate_dp, grid_num=(5,1)):
+def count_per_grid(cord_dirc, grid_num=(5,1)):
     """
     save data that counted oubject per grid
 
     input:
-        cordinate_dp: directory path (codinate of target (.npy))
+        cord_dirc: directory path (codinate of target (.npy))
         grid_num:    (col, row), default value is (5, 4)
 
     index of grid:
@@ -58,7 +58,7 @@ def count_per_grid(cordinate_dp, grid_num=(5,1)):
 
         return count_dict
 
-    file_lst = glob.glob(cordinate_dp + "*.npy")
+    file_lst = glob.glob(cord_dirc + "*.npy")
     if len(file_lst) == 0:
         sys.stderr.write("Error: not found cordinate file(.npy)")
         sys.exit(1)
@@ -70,7 +70,7 @@ def count_per_grid(cordinate_dp, grid_num=(5,1)):
         grid_dictlst[i] = []
 
     for i in tqdm(range(1, len(file_lst)+1)):
-        cordinate = np.load(cordinate_dp + "{}.npy".format(i))
+        cordinate = np.load(cord_dirc + "{}.npy".format(i))
         cordinate_df = pd.DataFrame(cordinate, columns=["x", "y"]).astype(np.int32)
         count_dict = count_feature(cordinate_df, grid_num)
         for key, value in count_dict.items():
@@ -83,11 +83,12 @@ def count_per_grid(cordinate_dp, grid_num=(5,1)):
     grid_df["sum"] = sum_series
     grid_df["max"] = max_series
     grid_df["max_index"] = idxmax_series
+    grid_df.to_csv(args.save_grid_path, index=False)
 
     return grid_df
 
 
-def plot(value_lst, info_dict, output_path):
+def plot(value_lst, args):
     """
     input:
         value_lst: list of target value
@@ -112,21 +113,49 @@ def plot(value_lst, info_dict, output_path):
 
     plt.figure()
     plt.figure(figsize=(20, 6))
-    plt.title(info_dict["title"])
-    plt.xlabel(info_dict["xlabel"])
-    plt.ylabel(info_dict["ylabel"])
+    plt.title(info_dict[args.title])
+    plt.xlabel(info_dict[args.xlabel])
+    plt.ylabel(info_dict[args.ylabel])
     set_graph(value_lst)
-    plt.savefig(output_path)
+    plt.savefig(args.save_img_path)
 
-    print("SAVE: graph({})".format(output_path))
+    logger.debug("SAVE: graph({})".format(args.save_img_path))
 
 
-def main(cordinate_dp, grid_num):
-    grid_df = count_per_grid(cordinate_dp, grid_num)
-    grid_df.to_csv("../data/output/{}_grid_count.csv".format(cordinate_dp.split("/")[-2]), index=False)
-    info_dict = {"title":"occupancy of feature points", "xlabel":"frame number", "ylabel":"occupancy rate [%]"}
-    plot(list(grid_df["max"]/grid_df["sum"]), info_dict, "../data/output/1min_grid.png")
+def main(args):
+    grid_df = count_per_grid(args.cord_dirc, args.grid_num)
+    plot(list(grid_df["max"]/grid_df["sum"]), args)
+
+
+def grid_parse():
+    parser = argparse.ArgumentParser(
+        prog="count_per_grid.py",
+        usage="",
+        description="description",
+        epilog="end",
+        add_help=True
+    )
+
+    # Data Argument
+    parser.add_argument("--cord_dirc", type=str,
+                        default="/Users/sakka/cnn_anomaly_detection/data/cord/20170421/9/")
+    parser.add_argument("--save_grid_path", type=str,
+                        default="/Users/sakka/cnn_anomaly_detection/data/output/grid_count/20170421/9.csv")
+    parser.add_argument("--save_img_path", type=str,
+                        default="/Users/sakka/cnn_anomaly_detection/image/output/grid_count/20170421/9.png")
+
+    # Parameter Argument
+    parser.add_argument("--grid_num", type=tuple, default=(5, 1))
+    parser.add_argument("--sigma_pow", type=int, default=25)
+    parser.add_argument("--titel", type=str, default="occupancy of feature points")
+    parser.add_argument("--xlabel", type=str, default="frame number")
+    parser.add_argument("--ylabel", type=str, default="occupancy rate [%]")
+
+    args = parser.parse_args()
+
+    return args
+
 
 if __name__ == "__main__":
-    args = sys.argv
-    main(args[1], grid_num=(5,1))
+    args = grid_parse()
+    main(args)
