@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 #coding: utf-8
 
+import logging
 import numpy as np 
 import pandas as pd
 import matplotlib
@@ -10,6 +11,13 @@ import seaborn as sns
 import glob
 from tqdm import tqdm
 from tqdm import trange
+
+
+logger = logging.getLogger(__name__)
+logs_path = "/Users/sakka/cnn_anomaly_detection/logs/plot_densmap.log"
+logging.basicConfig(filename=logs_path,
+                    level=logging.DEBUG,
+                    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 def total_cord(cord_dircpath):
     cord_file_lst = glob.glob(cord_dircpath+"*.csv")

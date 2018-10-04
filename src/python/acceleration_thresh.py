@@ -2,10 +2,17 @@
 #coding: utf-8
 
 import os
+import logging
 import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+
+logger = logging.getLogger(__name__)
+logs_path = "/Users/sakka/cnn_anomaly_detection/logs/acceleration_thresh.log"
+logging.basicConfig(filename=logs_path,
+                    level=logging.DEBUG,
+                    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 
 def calc_thresh(value_lst, weight, window, min_value, max_value):
@@ -62,7 +69,9 @@ def acceleration_thresh(args):
             window_thresh_lst = [current_thresh for _ in range(remaining_num)]
             thresh_lst.extend(window_thresh_lst)
 
-        np.savetxt(args.root_stats_dirc + time +"/acc_thresh.csv", thresh_lst, delimiter=",")
+        save_path = args.root_stats_dirc+time+"/acc_thresh.csv"
+        np.savetxt(save_path, thresh_lst, delimiter=",")
+        logger.debug("saved in {}".format(save_path))
 
 
 def make_acceleration_parse():
@@ -93,4 +102,5 @@ def make_acceleration_parse():
 
 if __name__ == "__main__":
     args = make_acceleration_parse()
+    logger.debug("Running with args: {}".format(args))
     acceleration_thresh(args)

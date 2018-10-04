@@ -2,11 +2,18 @@
 #coding: utf-8
 
 import sys
+import logging
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import glob
 from tqdm import tqdm
+
+logger = logging.getLogger(__name__)
+logs_path = "/Users/sakka/cnn_anomaly_detection/logs/count_per_grid.log"
+logging.basicConfig(filename=logs_path,
+                    level=logging.DEBUG,
+                    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 
 def count_per_grid(cordinate_dp, grid_num=(5,1)):

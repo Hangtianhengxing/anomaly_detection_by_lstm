@@ -1,10 +1,16 @@
 #! /usr/bin/env python
 # coding: utf-8
 
+import logging
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+logger = logging.getLogger(__name__)
+logs_path = "/Users/sakka/cnn_anomaly_detection/logs/plot__human_area.log"
+logging.basicConfig(filename=logs_path,
+                    level=logging.DEBUG,
+                    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 def plot_timeseries(file_path, output_path, property_dict):
     timeseries_df = pd.read_csv(file_path, header=None, names=["area_ratio"])
