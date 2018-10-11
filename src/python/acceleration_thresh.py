@@ -15,7 +15,7 @@ logging.basicConfig(filename=logs_path,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 
-def calc_thresh(value_lst, weight, window, min_value, max_value):
+def calc_thresh(value_lst, weight, window, min_value, max_value, prev_thresh):
     """
     calculate the acceleration threshold.
     thresh = weight*(mean of value_lst)
@@ -33,11 +33,11 @@ def calc_thresh(value_lst, weight, window, min_value, max_value):
     if pad_size > 0:
         pad_lst = [0 for _ in range(pad_size)]
         value_lst = pad_lst + value_lst
-    window_mean = weight * np.mean(value_lst[-window:])
+    thresh = weight * np.mean(value_lst[-window:])
 
     # condition
-    thresh = max(window_mean, min_value)
-    thresh = min(thresh, max_value)
+    if (thresh < min_value) or (max_value < thresh):
+        thresh = prev_thresh
 
     return thresh
 
@@ -53,19 +53,23 @@ def acceleration_thresh(args):
     times_lst = os.listdir(args.root_stats_dirc)
     times_lst = [time for time in times_lst if os.path.isdir(args.root_stats_dirc + time)]
 
+    # when the condition is NOT satisfied, the threshold use before one step
+    prev_thresh = args.min_value
+
     for time in tqdm(times_lst):
         stats_lst = list(np.loadtxt(args.root_stats_dirc+time+"/"+args.stats_format))
         thresh_lst = []
         for i in range(int(len(stats_lst)/args.window)):
             start_index = i*args.window
-            current_thresh = calc_thresh(stats_lst[:start_index], args.weight, args.window, args.min_value, args.max_value)
+            current_thresh = calc_thresh(stats_lst[:start_index], args.weight, args.window, args.min_value, args.max_value, prev_thresh)
             window_thresh_lst = [current_thresh for _ in range(args.window)]
             thresh_lst.extend(window_thresh_lst)
+            prev_thresh = current_thresh
 
         # terminal element processing
         remaining_num = len(stats_lst)%args.window
         if remaining_num != 0:
-            current_thresh = calc_thresh(stats_lst[-remaining_num:], args.weight, args.window, args.min_value, args.max_value)
+            current_thresh = calc_thresh(stats_lst[-remaining_num:], args.weight, args.window, args.min_value, args.max_value, prev_thresh)
             window_thresh_lst = [current_thresh for _ in range(remaining_num)]
             thresh_lst.extend(window_thresh_lst)
 
@@ -92,7 +96,7 @@ def make_acceleration_parse():
     # Parameter Argumant
     parser.add_argument("--weight", type=float, default=2.5)
     parser.add_argument("--window", type=int, default=30*60)
-    parser.add_argument("--min_value", type=int, default=100)
+    parser.add_argument("--min_value", type=int, default=150)
     parser.add_argument("--max_value", type=int, default=500)
 
     args = parser.parse_args()
