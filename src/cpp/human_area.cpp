@@ -82,6 +82,11 @@ void human_area(std::string input_file_path, std::string human_mask_path, std::s
     human_vec.reserve(total_frame+10);
     int frame_num = 0;
 
+    //skip untill first frame (initial frame is company logo)
+    for (int i=0;i<4*30;i++) {
+        capture >> frame;
+        frame_num++;
+    }
 
     while(true) {
         capture >> frame;
