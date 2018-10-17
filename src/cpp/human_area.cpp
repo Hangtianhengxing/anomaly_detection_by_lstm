@@ -31,7 +31,7 @@ float calc_area_ratio(cv::Mat &img, cv::Mat &bin_mask) {
     }
 
     // binarizes the input image with the threshold value 150 and extracts only mask region
-    cv::threshold(gray_img, gray_img, 150, 255, cv::THRESH_BINARY);
+    cv::threshold(gray_img, gray_img, 120, 255, cv::THRESH_BINARY);
 
     int positive_num = 0; // number of human point
     int total_num = 0; // number of no masked area point
