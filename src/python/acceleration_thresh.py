@@ -94,10 +94,10 @@ def make_acceleration_parse():
                         default="max.csv", help="select from mean.csv, val.csv, max.csv")
    
     # Parameter Argumant
-    parser.add_argument("--weight", type=float, default=2.5)
-    parser.add_argument("--window", type=int, default=30*60)
-    parser.add_argument("--min_value", type=int, default=150)
-    parser.add_argument("--max_value", type=int, default=500)
+    parser.add_argument("--weight", type=float, default=2.1)
+    parser.add_argument("--window", type=int, default=30*60*5)
+    parser.add_argument("--min_value", type=int, default=100)
+    parser.add_argument("--max_value", type=int, default=400)
 
     args = parser.parse_args()
 
