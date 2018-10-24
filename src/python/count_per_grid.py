@@ -17,7 +17,7 @@ logging.basicConfig(filename=logs_path,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 
-def count_per_grid(cord_dirc, extention, grid_num=(5,1)):
+def count_per_grid(cord_dirc, extention, grid_num=(8,1)):
     """
     save data that counted oubject per grid
 
@@ -50,12 +50,15 @@ def count_per_grid(cord_dirc, extention, grid_num=(5,1)):
         cordinate_df["y_g"] = (cordinate_df["y"]/grid_size[1]).astype(np.int32)
 
         count_dict = {}
-        grid_index = 0
+        grid_y_index = 0
+        grid_x_index = 0
         for y in range(grid_num[1]):
             for x in range(grid_num[0]):
                 count = len(cordinate_df[(cordinate_df["x_g"] == x) & (cordinate_df["y_g"] == y)])
-                count_dict[grid_index] = count
-                grid_index += 1
+                count_dict["grid_{}_{}".format(grid_y_index, grid_x_index)] = count
+                grid_x_index += 1
+            grid_y_index += 1
+            grid_x_index = 0
 
         return count_dict
 
@@ -67,8 +70,9 @@ def count_per_grid(cord_dirc, extention, grid_num=(5,1)):
         pass
 
     grid_dictlst = {}
-    for i in range(grid_num[0]*grid_num[1]):
-        grid_dictlst[i] = []
+    for grid_y in range(grid_num[1]):
+        for grid_x in range(grid_num[0]):
+            grid_dictlst["grid_{}_{}".format(grid_y, grid_x)] = []
 
     for i in tqdm(range(len(file_lst))):
         cordinate = np.loadtxt(file_lst[i], delimiter=",")
@@ -142,9 +146,9 @@ def grid_parse():
                         default="/Users/sakka/cnn_anomaly_detection/data/cord/20170421/9/")
     parser.add_argument("--extention", type=str, default=".csv")
     parser.add_argument("--save_grid_path", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/output/grid_count/20170421/9.csv")
+                        default="/Users/sakka/cnn_anomaly_detection/data/grid_count/20170421/9.csv")
     parser.add_argument("--save_img_path", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/image/output/grid_count/20170421/9.png")
+                        default="/Users/sakka/cnn_anomaly_detection/image/grid_count/20170421/9.png")
 
     # Parameter Argument
     parser.add_argument("--grid_num", type=tuple, default=(8, 1))
