@@ -50,11 +50,11 @@ def make_datasets(args):
         tmp_grid_df = pd.read_csv(args.root_grid_count_dirc + args.day + "/{}.csv".format(time_idx))
         for grid_y in range(args.grid_num[1]):
             for grid_x in range(args.grid_num[0]):
-                grid_dictlst["grid_{}_{}".format(grid_y, grid_x)].extend(list(tmp_grid_df["grid_{}_{}".format(grid_y, grid_x)]))
+                grid_dictlst["grid_{}_{}".format(grid_y, grid_x)].extend(list(tmp_grid_df["grid_{}_{}".format(grid_y, grid_x)]/tmp_grid_df["sum"]))
 
 
-    feed_lst = list(np.loadtxt(args.root_feed_dirc + args.day + "/feed.csv", delimiter=","))
-    diver_lst = list(np.loadtxt(args.root_diver_dirc + args.day + "/diver.csv", delimiter=","))
+    feed_lst = list(np.loadtxt(args.root_feed_dirc + args.day + "/feed.csv", dtype="uint8", delimiter=","))
+    diver_lst = list(np.loadtxt(args.root_diver_dirc + args.day + "/diver.csv", dtype="uint8", delimiter=","))
 
     # NEED FIX
     # completion
