@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 logger = logging.getLogger(__name__)
-logs_path = "/Users/sakka/cnn_anomaly_detection/logs/plot__human_area.log"
+logs_path = "/Users/sakka/cnn_anomaly_detection/logs/plot_human_area.log"
 logging.basicConfig(filename=logs_path,
                     level=logging.DEBUG,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")

@@ -86,11 +86,16 @@ def make_datasets(args):
                 datasets_dictlst["grid_{}_{}".format(grid_y, grid_x)] = grid_dictlst["grid_{}_{}".format(grid_y, grid_x)][int(i/30)]
 
         if max_lst[i + args.pred_frame] >= thresh_lst[i + args.pred_frame]:
+            # anormal
             datasets_dictlst["label"].append(1)
         else:
+            # normal
             datasets_dictlst["label"].append(0)
 
     datasets_df = pd.DataFrame(datasets_dictlst)
+    logger.debug("DATA: {}, NORMAL: {}, ANORMAL: {}".format(\
+                args.day, len(datasets_df[datasets_df["label"] == 0]), len(datasets_df[datasets_df["label"] == 1])))
+
     save_path = args.save_datasets_dirc + "time_series_{}.csv".format(args.day)
     datasets_df.to_csv(save_path, index=False)
     logger.debug("SAVE datasets: {}".format(save_path))
