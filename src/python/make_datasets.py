@@ -5,7 +5,6 @@ import sys
 import logging
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import argparse
 
 logger = logging.getLogger(__name__)
@@ -27,6 +26,10 @@ def make_datasets(args):
     thresh_lst = []
     human_lst = []
     grid_dictlst = {}
+    degree_dictlst = {"right":[], "left":[], "up":[], "down":[], \
+                        "others_1":[], "others_2":[], "others_3":[], "others_4":[], \
+                        "degree_mean":[], "degree_std":[]}
+
     for grid_y in range(args.grid_num[1]):
         for grid_x in range(args.grid_num[0]):
             grid_dictlst["grid_{}_{}".format(grid_y, grid_x)] = []
@@ -46,7 +49,13 @@ def make_datasets(args):
         max_lst.extend(tmp_max_lst[:-remove_last_frame])
         thresh_lst.extend(tmp_thresh_lst[:-remove_last_frame])
         human_lst.extend(tmp_human_lst[:-remove_last_frame])
+        
+        # load data of degree
+        tmp_degree_dictlst = dict(pd.read_csv(args.root_statistics_dirc + args.day + "/{}/prep_degree.csv"))
+        for key, value in tmp_degree_dictlst.items():
+            degree_dictlst[key].extend(list(value)[:-remove_last_frame])
 
+        # load data of density
         tmp_grid_df = pd.read_csv(args.root_grid_count_dirc + args.day + "/{}.csv".format(time_idx))
         for grid_y in range(args.grid_num[1]):
             for grid_x in range(args.grid_num[0]):
@@ -66,9 +75,13 @@ def make_datasets(args):
     # initialized datasets
     datasets_dictlst = {"mean": [], "val": [], "max": [], "thresh": [], "human": [],
                         "feed": [], "diver": [], "label": []}
+
     for grid_y in range(args.grid_num[1]):
             for grid_x in range(args.grid_num[0]):
                 datasets_dictlst["grid_{}_{}".format(grid_y, grid_x)] = []
+
+    for key in degree_dictlst.keys():
+        datasets_dictlst[key] = []
     
     # recode several time series data
     for i in range(0, len(mean_lst) - args.pred_frame, 30):
@@ -80,11 +93,17 @@ def make_datasets(args):
         datasets_dictlst["feed"].append(feed_lst[i])
         datasets_dictlst["diver"].append(diver_lst[i])
 
+        # density data
         for grid_y in range(args.grid_num[1]):
             for grid_x in range(args.grid_num[0]):
                 # NEED FIX
                 datasets_dictlst["grid_{}_{}".format(grid_y, grid_x)] = grid_dictlst["grid_{}_{}".format(grid_y, grid_x)][int(i/30)]
 
+        # degree data
+        for key, value in degree_dictlst.items():
+            datasets_dictlst[key].append(value[i])
+
+        # answer label
         if max_lst[i + args.pred_frame] >= thresh_lst[i + args.pred_frame]:
             # anormal
             datasets_dictlst["label"].append(1)
@@ -135,7 +154,6 @@ def datasets_parse():
     args = parser.parse_args()
 
     return args
-
 
 
 if __name__ == "__main__":
