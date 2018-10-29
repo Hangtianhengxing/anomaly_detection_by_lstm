@@ -91,7 +91,7 @@ void write_csv(std::vector<float> &vec_data, string output_csv_file_path) {
     std::ofstream ofs(output_csv_file_path);
     if (ofs) {
         for (unsigned int i = 0; i < vec_data.size(); ++i) {
-            ofs << vec_data[i] << "\n";
+            ofs << vec_data[i] << endl;
         }
     }
     else {
