@@ -16,6 +16,7 @@ using std::string;
 extern void display_info(string, int, int, int, int, double);
 extern cv::Mat read_mask(string, bool);
 extern void write_csv(std::vector<float>&, string);
+extern void save_frame_num(std::vector<int>&, string);
 
 
 float calc_area_ratio(cv::Mat &img, cv::Mat &bin_mask) {
@@ -56,7 +57,7 @@ float calc_area_ratio(cv::Mat &img, cv::Mat &bin_mask) {
 }
 
 
-void human_area(std::string input_file_path, std::string human_mask_path, std::string output_file_path) {
+void human_area(string input_file_path, string human_mask_path, string output_human_path, string output_frame_num_path) {
     cv::VideoCapture capture(input_file_path);
     int width = (int)capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int height = (int)capture.get(CV_CAP_PROP_FRAME_HEIGHT);
@@ -81,6 +82,8 @@ void human_area(std::string input_file_path, std::string human_mask_path, std::s
     std::vector<float> human_vec;
     human_vec.reserve(total_frame+10);
     int frame_num = 0;
+    std::vector<int> frame_vec;
+    frame_vec.reserve(total_frame+10);
 
     //skip untill first frame (initial frame is company logo)
     for (int i=0;i<4*30;i++) {
@@ -93,6 +96,7 @@ void human_area(std::string input_file_path, std::string human_mask_path, std::s
         if (frame.empty()) break;
         
         frame_num++;
+        frame_vec.push_back(frame_num);
         if (frame_num%1000==0) {
             cout << "Frame number: " << frame_num << "/" << total_frame << endl;
         }
@@ -103,7 +107,8 @@ void human_area(std::string input_file_path, std::string human_mask_path, std::s
     }
     cv::destroyAllWindows();
 
-    write_csv(human_vec, output_file_path);
+    write_csv(human_vec, output_human_path);
+    save_frame_num(frame_vec, output_frame_num_path);
     cout << "Done: save human area data." << endl;
 
 }
