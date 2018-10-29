@@ -103,3 +103,29 @@ void write_csv(std::vector<float> &vec_data, string output_csv_file_path) {
     ofs.close();
     cout << "SAVE PATH: " << output_csv_file_path << endl;
 }
+
+
+void save_frame_num(std::vector<int> &vec_data, string output_csv_file_path) {
+    /**
+     * write csv file by vector data
+     * 
+     * input:
+     *   vec_data: 
+     *   output_csv_file_path: absolute path
+    **/
+
+    std::ofstream ofs(output_csv_file_path);
+    if (ofs) {
+        for (unsigned int i = 0; i < vec_data.size(); ++i) {
+            ofs << vec_data[i] << endl;
+        }
+    }
+    else {
+        cout << "ERROR: can not open file. please check file path." << endl;
+        cout << "PATH: " << output_csv_file_path << endl;
+        exit(1);
+    }
+
+    ofs.close();
+    cout << "SAVE PATH: " << output_csv_file_path << endl;
+}
