@@ -103,7 +103,12 @@ void human_area(string input_file_path, string human_mask_path, string output_hu
 
         cv::cvtColor(frame, gray_frame, CV_RGB2GRAY);
         area_ratio = calc_area_ratio(gray_frame, bin_human_mask);
-        human_vec.push_back(area_ratio); 
+        human_vec.push_back(area_ratio);
+
+        // remove company logo
+        if (frame_num >= total_frame-3*30){
+            break;
+        } 
     }
     cv::destroyAllWindows();
 
