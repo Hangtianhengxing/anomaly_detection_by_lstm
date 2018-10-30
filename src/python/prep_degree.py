@@ -7,10 +7,10 @@ import logging
 import numpy as np
 import pandas as pd
 import argparse
-from tqdm import trange
+from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
-logs_path = "/Users/kenya/cnn_anomaly_detection/logs/prep_degree.log"
+logs_path = "/Users/sakka/cnn_anomaly_detection/logs/prep_degree.log"
 logging.basicConfig(filename=logs_path,
                     level=logging.DEBUG,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
@@ -87,7 +87,7 @@ def direction_ratio(degree_lst, deg_width):
 
 
 def prep_degree(args):
-    for time_idx in trange(9, 17):
+    for time_idx in tqdm(range(9, 17)):
         degree_df = load_degree(args.root_degree_dirc+"{}/degree.csv".format(time_idx), args.round_deg, args.deg_width)
         save_degree_path = args.root_degree_dirc + "{}/prep_degree.csv".format(time_idx)
         degree_df.to_csv(save_degree_path, index=False)
@@ -105,7 +105,7 @@ def prep_degree_parse():
 
     # Data Argument
     parser.add_argument("--root_degree_dirc", type=str,
-                        default="/Users/kenya/cnn_anomaly_detection/data/statistics/20170421/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/20170422/")
    
     # Parameter Argumant
     parser.add_argument("--round_deg", type=int, default=10)

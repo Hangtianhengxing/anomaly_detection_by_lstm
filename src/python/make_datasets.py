@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 import argparse
 
+from tqdm import tqdm
+
 logger = logging.getLogger(__name__)
 logs_path = "/Users/sakka/cnn_anomaly_detection/logs/make_datasets.log"
 logging.basicConfig(filename=logs_path,
@@ -35,7 +37,7 @@ def make_datasets(args):
             grid_dictlst["grid_{}_{}".format(grid_y, grid_x)] = []
 
     # get several time series data
-    for time_idx in range(args.start_time, args.end_time):
+    for time_idx in tqdm(range(args.start_time, args.end_time)):
         # load current time series data
         tmp_mean_lst = list(np.loadtxt(args.root_statistics_dirc + args.day + "/{}/mean.csv".format(time_idx), delimiter=","))
         tmp_val_lst = list(np.loadtxt(args.root_statistics_dirc + args.day + "/{}/var.csv".format(time_idx), delimiter=","))
@@ -51,9 +53,9 @@ def make_datasets(args):
         human_lst.extend(tmp_human_lst[:-remove_last_frame])
         
         # load data of degree
-        tmp_degree_dictlst = dict(pd.read_csv(args.root_statistics_dirc + args.day + "/{}/prep_degree.csv"))
+        tmp_degree_dictlst = dict(pd.read_csv(args.root_statistics_dirc + args.day + "/{}/prep_degree.csv".format(time_idx)))
         for key, value in tmp_degree_dictlst.items():
-            degree_dictlst[key].extend(list(value)[:-remove_last_frame])
+            degree_dictlst[key].extend(list(value))
 
         # load data of density
         tmp_grid_df = pd.read_csv(args.root_grid_count_dirc + args.day + "/{}.csv".format(time_idx))
@@ -84,7 +86,7 @@ def make_datasets(args):
         datasets_dictlst[key] = []
     
     # recode several time series data
-    for i in range(0, len(mean_lst) - args.pred_frame, 30):
+    for i in tqdm(range(0, len(mean_lst) - args.pred_frame, 30)):
         datasets_dictlst["mean"].append(mean_lst[i])
         datasets_dictlst["val"].append(val_lst[i])
         datasets_dictlst["max"].append(max_lst[i])
@@ -101,7 +103,7 @@ def make_datasets(args):
 
         # degree data
         for key, value in degree_dictlst.items():
-            datasets_dictlst[key].append(value[i])
+            datasets_dictlst[key].append(value[int(i/30)])
 
         # answer label
         if max_lst[i + args.pred_frame] >= thresh_lst[i + args.pred_frame]:
@@ -131,7 +133,7 @@ def datasets_parse():
     )
 
     # Data Argument
-    parser.add_argument("--day", type=str, default="20170421")
+    parser.add_argument("--day", type=str, default="20170416")
     parser.add_argument("--root_statistics_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics/")
     parser.add_argument("--root_human_dirc", type=str,
@@ -149,7 +151,7 @@ def datasets_parse():
     parser.add_argument("--start_time", type=int, default=9)
     parser.add_argument("--end_time", type=int, default=17)
     parser.add_argument("--grid_num", type=tuple, default=(8, 1), help="(number of x axis, number of y axis)")
-    parser.add_argument("--pred_frame", type=int, default=0*30, help="how many frame after anormaly is detected (time*FPS)")
+    parser.add_argument("--pred_frame", type=int, default=10*30, help="how many frame after anormaly is detected (time*FPS)")
 
     args = parser.parse_args()
 
