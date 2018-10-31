@@ -17,7 +17,7 @@ logging.basicConfig(filename=logs_path,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 
-def count_per_grid(cord_dirc, extention, grid_num=(8,1)):
+def count_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
     """
     save data that counted oubject per grid
 
@@ -43,7 +43,6 @@ def count_per_grid(cord_dirc, extention, grid_num=(8,1)):
             cordinate_df: dataframe of target cordinate (columns: [x, y])
             grid_num:    (col, row)
         """
-
         img_size = (1280, 720)  # cordinate: (x, y)
         grid_size = (int(img_size[0]/grid_num[0]), int(img_size[1]/grid_num[1]))  # cordinate: (x, y)
         cordinate_df["x_g"] = (cordinate_df["x"]/grid_size[0]).astype(np.int32)
@@ -62,6 +61,16 @@ def count_per_grid(cord_dirc, extention, grid_num=(8,1)):
 
         return count_dict
 
+    def get_raw_info(file_lst, skip):
+        """
+        Extract the frame number from file path and extend it to the size of the raw data.
+        """
+        raw_data_lst = []
+        for path in file_lst:
+            raw_data = path.split("/")[-1]
+            raw_data_lst.extend([raw_data for _ in range(skip)])
+        return raw_data_lst
+
     file_lst = glob.glob(cord_dirc + "*" + extention)
     if len(file_lst) == 0:
         sys.stderr.write("Error: not found cordinate file(.npy)")
@@ -79,7 +88,7 @@ def count_per_grid(cord_dirc, extention, grid_num=(8,1)):
         cordinate_df = pd.DataFrame(cordinate, columns=["x", "y"]).astype(np.int32)
         count_dict = count_feature(cordinate_df, grid_num)
         for key, value in count_dict.items():
-            grid_dictlst[key].append(value)
+            grid_dictlst[key].extend([value for _ in range(skip)])
 
     grid_df = pd.DataFrame(grid_dictlst)
     sum_series = grid_df.sum(axis=1)
@@ -89,8 +98,9 @@ def count_per_grid(cord_dirc, extention, grid_num=(8,1)):
     grid_df["max"] = max_series
     grid_df["max_index"] = idxmax_series
 
-    assert len(grid_df) == len(file_lst)
-    grid_df["raw_data"] = file_lst
+    raw_data_lst = get_raw_info(file_lst, skip)
+    assert len(grid_df) == len(raw_data_lst)
+    grid_df["raw_data"] = raw_data_lst
 
     grid_df.to_csv(args.save_grid_path, index=False)
 
@@ -114,7 +124,7 @@ def plot(value_lst, args):
         valueYLimMax = 1.0
         plt.xlim(valueXLimMin, valueXLimMax)
         plt.ylim(valueYLimMin, valueYLimMax)
-        plt.xticks(np.arange(0,valueXLimMax+1, 30), np.arange(0,int(valueXLimMax/30)+1,1))  #30 is fps
+        plt.xticks(np.arange(0,valueXLimMax+1, args.skip), np.arange(0,int(valueXLimMax/args.skip)+1,1))
         plt.yticks(np.arange(0,1.1,0.1))
         plt.rcParams["font.size"] = 50
         plt.grid(True)
@@ -132,7 +142,7 @@ def plot(value_lst, args):
 
 
 def main(args):
-    grid_df = count_per_grid(args.cord_dirc, args.extention, args.grid_num)
+    grid_df = count_per_grid(args.cord_dirc, args.extention, args.skip, args.grid_num)
     plot(list(grid_df["max"]/grid_df["sum"]), args)
 
 
@@ -157,6 +167,7 @@ def grid_parse():
     # Parameter Argument
     parser.add_argument("--grid_num", type=tuple, default=(8, 1))
     parser.add_argument("--sigma_pow", type=int, default=25)
+    parser.add_argument("--skip", type=int, default=30, help="skip interval of frame")
     parser.add_argument("--titel", type=str, default="occupancy of feature points")
     parser.add_argument("--xlabel", type=str, default="frame number")
     parser.add_argument("--ylabel", type=str, default="occupancy rate [%]")
