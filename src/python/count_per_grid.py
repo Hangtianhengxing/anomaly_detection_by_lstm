@@ -2,6 +2,7 @@
 #coding: utf-8
 
 import sys
+import re
 import logging
 import numpy as np
 import pandas as pd
@@ -66,12 +67,22 @@ def count_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
         Extract the frame number from file path and extend it to the size of the raw data.
         """
         raw_data_lst = []
+        frame_num_lst = []
         for path in file_lst:
             raw_data = path.split("/")[-1]
             raw_data_lst.extend([raw_data for _ in range(skip)])
-        return raw_data_lst
+            # get frame nuber from file name of input cordinate
+            frame_num = int(raw_data[:-4])
+            frame_num_lst.extend([frame_num+i for i in range(skip)])
+        return raw_data_lst, frame_num_lst
 
-    file_lst = glob.glob(cord_dirc + "*" + extention)
+    def numerical_sort(value):
+        numbers = re.compile(r"(\d+)")
+        parts = numbers.split(value)
+        parts[1::2] = map(int, parts[1::2])
+        return parts
+
+    file_lst = sorted(glob.glob(cord_dirc + "*" + extention), key=numerical_sort)
     if len(file_lst) == 0:
         sys.stderr.write("Error: not found cordinate file(.npy)")
         sys.exit(1)
@@ -98,9 +109,11 @@ def count_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
     grid_df["max"] = max_series
     grid_df["max_index"] = idxmax_series
 
-    raw_data_lst = get_raw_info(file_lst, skip)
+    raw_data_lst, frame_num_lst = get_raw_info(file_lst, skip)
     assert len(grid_df) == len(raw_data_lst)
     grid_df["raw_data"] = raw_data_lst
+    assert len(grid_df) == len(frame_num_lst)
+    grid_df["frame_num"] = frame_num_lst
 
     grid_df.to_csv(args.save_grid_path, index=False)
 
