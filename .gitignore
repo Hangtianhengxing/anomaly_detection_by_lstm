@@ -10,4 +10,4 @@
 !*.md
 !*.cpp
 !Makefile
-
+!my_make.sh
