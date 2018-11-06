@@ -4,6 +4,7 @@
 import os
 import logging
 import numpy as np
+import pandas as pd
 import argparse
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -57,13 +58,14 @@ def acceleration_thresh(args):
     prev_thresh = args.min_value
 
     for time in tqdm(times_lst):
-        stats_lst = list(np.loadtxt(args.root_stats_dirc+time+"/"+args.stats_format))
-        thresh_lst = []
+        stats_df = pd.read_csv(args.root_stats_dirc + time + "/" + args.stats_format + ".csv")
+        stats_lst = list(stats_df[args.stats_format])
+        thresh_dctlst = {"frame_num":list(stats_df["frame_num"]), "acc_thresh":[]}
         for i in range(int(len(stats_lst)/args.window)):
             start_index = i*args.window
             current_thresh = calc_thresh(stats_lst[:start_index], args.weight, args.window, args.min_value, args.max_value, prev_thresh)
             window_thresh_lst = [current_thresh for _ in range(args.window)]
-            thresh_lst.extend(window_thresh_lst)
+            thresh_dctlst["acc_thresh"].extend(window_thresh_lst)
             prev_thresh = current_thresh
 
         # terminal element processing
@@ -71,10 +73,10 @@ def acceleration_thresh(args):
         if remaining_num != 0:
             current_thresh = calc_thresh(stats_lst[-remaining_num:], args.weight, args.window, args.min_value, args.max_value, prev_thresh)
             window_thresh_lst = [current_thresh for _ in range(remaining_num)]
-            thresh_lst.extend(window_thresh_lst)
+            thresh_dctlst["acc_thresh"].extend(window_thresh_lst)
 
         save_path = args.root_stats_dirc+time+"/acc_thresh.csv"
-        np.savetxt(save_path, thresh_lst, delimiter=",")
+        pd.DataFrame(thresh_dctlst).to_csv(save_path, index=False)
         logger.debug("saved in {}".format(save_path))
 
 
@@ -89,9 +91,9 @@ def make_acceleration_parse():
 
     # Data Argument
     parser.add_argument("--root_stats_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/20170421/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/20170416/")
     parser.add_argument("--stats_format", type=str,
-                        default="max.csv", help="select from mean.csv, val.csv, max.csv")
+                        default="max", help="select from mean, val, max")
    
     # Parameter Argumant
     parser.add_argument("--weight", type=float, default=2.1)
