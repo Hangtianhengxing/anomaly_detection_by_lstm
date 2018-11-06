@@ -18,17 +18,18 @@ logging.basicConfig(filename=logs_path,
 
 def load_degree(file_path, round_deg, deg_width):
     time_degree_lst = []
-    degree_dictlst = {"right":[], "left":[], "up":[], "down":[], \
-                                      "right_down":[], "left_down":[], "left_up":[], "right_up":[], \
-                                      "overall_dir":[], "degree_mean":[], "degree_std":[]}
+    degree_dictlst = {"frame_num":[], "right":[], "left":[], "up":[], "down":[], \
+                            "right_down":[], "left_down":[], "left_up":[], "right_up":[], \
+                            "overall_dir":[], "degree_mean":[], "degree_std":[]}
     with open(file_path, "r") as f:
         reader = csv.reader(f)
         header = next(reader)
         for row in reader:
+            degree_dictlst["frame_num"].append(row[0])
+            # skip index 0 (the value is frame number)
             if round_deg > 0:
                 time_degree_lst = round_degree(row[1:-1], args.round_deg)
             else:
-                # skip index 0 (the value is frame number)
                 time_degree_lst = np.array(row[1:], dtype="int32")
             # calc mean, val of degree for each time
             degree_dictlst["degree_mean"].append(np.mean(time_degree_lst))
