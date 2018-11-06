@@ -19,12 +19,17 @@ logging.basicConfig(filename=logs_path,
 def load_degree(file_path, round_deg, deg_width):
     time_degree_lst = []
     degree_dictlst = {"right":[], "left":[], "up":[], "down":[], \
-                                      "others_1":[], "others_2":[], "others_3":[], "others_4":[], \
-                                      "degree_mean":[], "degree_std":[]}
+                                      "right_down":[], "left_down":[], "left_up":[], "right_up":[], \
+                                      "overall_dir":[], "degree_mean":[], "degree_std":[]}
     with open(file_path, "r") as f:
         reader = csv.reader(f)
+        header = next(reader)
         for row in reader:
-            time_degree_lst = round_degree(row[:-1], args.round_deg)
+            if round_deg > 0:
+                time_degree_lst = round_degree(row[1:-1], args.round_deg)
+            else:
+                # skip index 0 (the value is frame number)
+                time_degree_lst = np.array(row[1:], dtype="int32")
             # calc mean, val of degree for each time
             degree_dictlst["degree_mean"].append(np.mean(time_degree_lst))
             degree_dictlst["degree_std"].append(np.std(time_degree_lst))
@@ -50,38 +55,40 @@ def direction_ratio(degree_lst, deg_width):
     down_count = 0
     left_count = 0
     up_count = 0
-    others_1_count = 0
-    others_2_count = 0
-    others_3_count = 0
-    others_4_count = 0
+    right_down_count = 0
+    left_down_count = 0
+    left_up_count = 0
+    right_up_count = 0
     
     for deg in degree_lst:
         if (deg >= deg_width) and (deg <= 90-deg_width):
-            others_1_count += 1
+            right_down_count += 1
         elif (deg >= 90-deg_width) and (deg <= 90+deg_width):
             down_count +=1
         elif (deg >= 90+deg_width) and (deg <= 180-deg_width):
-            others_2_count += 1
+            left_down_count += 1
         elif (deg >= 180-deg_width) and (deg <= 180+deg_width):
             left_count += 1
         elif (deg >= 180+deg_width) and (deg <= 270-deg_width):
-            others_3_count += 1
+            left_up_count += 1
         elif (deg >= 270-deg_width) and (deg <= 270+deg_width):
             up_count += 1
         elif (deg >= 270+deg_width) and (deg <= 360-deg_width):
-            others_4_count += 1
+            right_up_count += 1
         else:
             right_count += 1
     
     dir2ratio = {}
+    
     dir2ratio["right"] = right_count/len(degree_lst)
     dir2ratio["down"] = down_count/len(degree_lst)
     dir2ratio["left"] = left_count/len(degree_lst)
     dir2ratio["up"] = up_count/len(degree_lst)
-    dir2ratio["others_1"] = others_1_count/len(degree_lst)
-    dir2ratio["others_2"] = others_2_count/len(degree_lst)
-    dir2ratio["others_3"] = others_3_count/len(degree_lst)
-    dir2ratio["others_4"] = others_4_count/len(degree_lst)
+    dir2ratio["right_down"] = right_down_count/len(degree_lst)
+    dir2ratio["left_down"] = left_down_count/len(degree_lst)
+    dir2ratio["left_up"] = left_up_count/len(degree_lst)
+    dir2ratio["right_up"] = right_up_count/len(degree_lst)
+    dir2ratio["overall_dir"] = max(dir2ratio, key=dir2ratio.get)
     
     return dir2ratio
 
@@ -105,11 +112,11 @@ def prep_degree_parse():
 
     # Data Argument
     parser.add_argument("--root_degree_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/20170422/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/20170416/")
    
     # Parameter Argumant
-    parser.add_argument("--round_deg", type=int, default=10)
-    parser.add_argument("--deg_width", type=int, default=10)
+    parser.add_argument("--round_deg", type=int, default=0)
+    parser.add_argument("--deg_width", type=int, default=5)
 
     args = parser.parse_args()
 
