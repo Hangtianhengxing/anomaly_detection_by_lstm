@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 #coding: utf-8
 
-import sys
+import os
 import logging
 import numpy as np
 import pandas as pd
@@ -17,110 +17,56 @@ logging.basicConfig(filename=logs_path,
 
 
 def make_datasets(args):
-    # NEED FIX
-    # company logo
-    remove_last_frame = 120
+    # get time series directory list under the root directory
+    times_lst = os.listdir("{}/{}/".format(args.root_stats_dirc, args.date))
+    times_lst = [time for time in times_lst if os.path.isdir("{}/{}/{}/".format(args.root_stats_dirc, args.date, time))]
 
-    # initialize
-    mean_lst = []
-    val_lst = []
-    max_lst = []
-    thresh_lst = []
-    human_lst = []
-    grid_dictlst = {}
-    degree_dictlst = {"right":[], "left":[], "up":[], "down":[], \
-                        "others_1":[], "others_2":[], "others_3":[], "others_4":[], \
-                        "degree_mean":[], "degree_std":[]}
+    day_lst = ["Sun", "Mon", "Tue", "Wed", "Thurs", "Fri", "Sat"]
 
-    for grid_y in range(args.grid_num[1]):
-        for grid_x in range(args.grid_num[0]):
-            grid_dictlst["grid_{}_{}".format(grid_y, grid_x)] = []
+    for time_idx in tqdm(times_lst):
+        mean_df = pd.read_csv("{}/{}/{}/mean.csv".format(args.root_stats_dirc, args.date, time_idx))
+        var_df = pd.read_csv("{}/{}/{}/var.csv".format(args.root_stats_dirc, args.date, time_idx))
+        max_df = pd.read_csv("{}/{}/{}/max.csv".format(args.root_stats_dirc, args.date, time_idx))
+        thresh_df = pd.read_csv("{}/{}/{}/acc_thresh.csv".format(args.root_stats_dirc, args.date, time_idx))
+        degree_df = pd.read_csv("{}/{}/{}/prep_degree.csv".format(args.root_stats_dirc, args.date, time_idx))
+        degree_df = pd.get_dummies(degree_df)
+        grid_df = pd.read_csv("{}/{}/{}.csv".format(args.root_grid_dirc, args.date, time_idx))
+        grid_df = grid_df.drop(["raw_data", "sum_count"], axis=1)
+        grid_df = pd.get_dummies(grid_df)
+        human_df = pd.read_csv("{}/{}/{}.csv".format(args.root_human_dirc, args.date, time_idx))
+        diver_df = pd.read_csv("{}/{}/diver_{}.csv".format(args.root_diver_dirc, args.date, time_idx))
+        feed_df = pd.read_csv("{}/{}/feed_{}.csv".format(args.root_feed_dirc, args.date, time_idx))
 
-    # get several time series data
-    for time_idx in tqdm(range(args.start_time, args.end_time)):
-        # load current time series data
-        tmp_mean_lst = list(np.loadtxt(args.root_statistics_dirc + args.day + "/{}/mean.csv".format(time_idx), delimiter=","))
-        tmp_val_lst = list(np.loadtxt(args.root_statistics_dirc + args.day + "/{}/var.csv".format(time_idx), delimiter=","))
-        tmp_max_lst = list(np.loadtxt(args.root_statistics_dirc + args.day + "/{}/max.csv".format(time_idx), delimiter=","))
-        tmp_thresh_lst = list(np.loadtxt(args.root_statistics_dirc + args.day + "/{}/acc_thresh.csv".format(time_idx), delimiter=","))
-        tmp_human_lst = list(np.loadtxt(args.root_human_dirc + args.day + "/human_{}.csv".format(time_idx), delimiter=","))
+        # concat ttime series data
+        time_series_df = mean_df
+        time_series_df = pd.merge(time_series_df, var_df,  on="frame_num")
+        time_series_df = pd.merge(time_series_df, max_df,  on="frame_num")
+        time_series_df = pd.merge(time_series_df, thresh_df,  on="frame_num")
+        time_series_df = pd.merge(time_series_df, degree_df,  on="frame_num")
+        time_series_df = pd.merge(time_series_df, grid_df,  on="frame_num")
+        time_series_df = pd.merge(time_series_df, human_df,  on="frame_num")
+        time_series_df = pd.merge(time_series_df, diver_df, on="frame_num")
+        time_series_df = pd.merge(time_series_df, feed_df, on="frame_num")
 
-        # update time series data
-        mean_lst.extend(tmp_mean_lst[:-remove_last_frame])
-        val_lst.extend(tmp_val_lst[:-remove_last_frame])
-        max_lst.extend(tmp_max_lst[:-remove_last_frame])
-        thresh_lst.extend(tmp_thresh_lst[:-remove_last_frame])
-        human_lst.extend(tmp_human_lst[:-remove_last_frame])
-        
-        # load data of degree
-        tmp_degree_dictlst = dict(pd.read_csv(args.root_statistics_dirc + args.day + "/{}/prep_degree.csv".format(time_idx)))
-        for key, value in tmp_degree_dictlst.items():
-            degree_dictlst[key].extend(list(value))
+        # make answer label
+        time_series_df["label"] = pd.Series(
+            time_series_df["max"] > time_series_df["acc_thresh"], dtype=int)
+        time_series_df = time_series_df.drop("acc_thresh", axis=1)
+        for end_idx in list(time_series_df.query('label == 1').index):
+            start_idx = end_idx - args.pred_time if end_idx > args.pred_time else 0
+            time_series_df.loc[start_idx:end_idx, "label"] = 1
 
-        # load data of density
-        tmp_grid_df = pd.read_csv(args.root_grid_count_dirc + args.day + "/{}.csv".format(time_idx))
-        for grid_y in range(args.grid_num[1]):
-            for grid_x in range(args.grid_num[0]):
-                grid_dictlst["grid_{}_{}".format(grid_y, grid_x)].extend(list(tmp_grid_df["grid_{}_{}".format(grid_y, grid_x)]/tmp_grid_df["sum"]))
+        # weekly infomation
+        for cur_day in day_lst:
+            if cur_day == args.day:
+                time_series_df[cur_day] = 1
+            else:
+                time_series_df[cur_day] = 0
 
-
-    feed_lst = list(np.loadtxt(args.root_feed_dirc + args.day + "/feed.csv", dtype="uint8", delimiter=","))
-    diver_lst = list(np.loadtxt(args.root_diver_dirc + args.day + "/diver.csv", dtype="uint8", delimiter=","))
-
-    # NEED FIX
-    # completion
-    for i in range(1, len(human_lst)):
-        if human_lst[i] > 0.95:
-            human_lst[i] = human_lst[i-1]
-
-    
-    # initialized datasets
-    datasets_dictlst = {"mean": [], "val": [], "max": [], "thresh": [], "human": [],
-                        "feed": [], "diver": [], "label": []}
-
-    for grid_y in range(args.grid_num[1]):
-            for grid_x in range(args.grid_num[0]):
-                datasets_dictlst["grid_{}_{}".format(grid_y, grid_x)] = []
-
-    for key in degree_dictlst.keys():
-        datasets_dictlst[key] = []
-    
-    # recode several time series data
-    for i in tqdm(range(0, len(mean_lst) - args.pred_frame, 30)):
-        datasets_dictlst["mean"].append(mean_lst[i])
-        datasets_dictlst["val"].append(val_lst[i])
-        datasets_dictlst["max"].append(max_lst[i])
-        datasets_dictlst["thresh"].append(thresh_lst[i])
-        datasets_dictlst["human"].append(human_lst[i])
-        datasets_dictlst["feed"].append(feed_lst[i])
-        datasets_dictlst["diver"].append(diver_lst[i])
-
-        # density data
-        for grid_y in range(args.grid_num[1]):
-            for grid_x in range(args.grid_num[0]):
-                # NEED FIX
-                datasets_dictlst["grid_{}_{}".format(grid_y, grid_x)] = grid_dictlst["grid_{}_{}".format(grid_y, grid_x)][int(i/30)]
-
-        # degree data
-        for key, value in degree_dictlst.items():
-            datasets_dictlst[key].append(value[int(i/30)])
-
-        # answer label
-        if max_lst[i + args.pred_frame] >= thresh_lst[i + args.pred_frame]:
-            # anormal
-            datasets_dictlst["label"].append(1)
-        else:
-            # normal
-            datasets_dictlst["label"].append(0)
-
-    datasets_df = pd.DataFrame(datasets_dictlst)
-    logger.debug("DATA: {}, NORMAL: {}, ANORMAL: {}".format(\
-                args.day, len(datasets_df[datasets_df["label"] == 0]), len(datasets_df[datasets_df["label"] == 1])))
-
-    save_path = args.save_datasets_dirc + "time_series_{}.csv".format(args.day)
-    datasets_df.to_csv(save_path, index=False)
-    logger.debug("SAVE datasets: {}".format(save_path))
-
+        # save dataset
+        save_path = "{}/{}/time_series_{}.csv".format(args.save_datasets_dirc, args.date, time_idx)
+        time_series_df.to_csv(save_path, index=False)
+        logger.debug("save dataset: {}".format(save_path))
 
 
 def datasets_parse():
@@ -133,25 +79,24 @@ def datasets_parse():
     )
 
     # Data Argument
-    parser.add_argument("--day", type=str, default="20170416")
-    parser.add_argument("--root_statistics_dirc", type=str,
+    parser.add_argument("--date", type=str, default="20170416")
+    parser.add_argument("--day", type=str, default="Sun",
+                        help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
+    parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics/")
+    parser.add_argument("--root_grid_dirc", type=str,
+                        default="/Users/sakka/cnn_anomaly_detection/data/grid_count/")
     parser.add_argument("--root_human_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/human_area/")
     parser.add_argument("--root_feed_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/feed/")
     parser.add_argument("--root_diver_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/diver/")
-    parser.add_argument("--root_grid_count_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/grid_count/")
     parser.add_argument("--save_datasets_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/datasets/")
 
     # Parameter Argument
-    parser.add_argument("--start_time", type=int, default=9)
-    parser.add_argument("--end_time", type=int, default=17)
-    parser.add_argument("--grid_num", type=tuple, default=(8, 1), help="(number of x axis, number of y axis)")
-    parser.add_argument("--pred_frame", type=int, default=10*30, help="how many frame after anormaly is detected (time*FPS)")
+    parser.add_argument("--pred_time", type=int, default=5*60*30, help="how many frame after anormaly is detected (sec*FPS)")
 
     args = parser.parse_args()
 

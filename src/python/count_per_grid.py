@@ -105,8 +105,8 @@ def count_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
     sum_series = grid_df.sum(axis=1)
     max_series = grid_df.max(axis=1)
     idxmax_series = grid_df.idxmax(axis=1)
-    grid_df["sum"] = sum_series
-    grid_df["max"] = max_series
+    grid_df["sum_count"] = sum_series
+    grid_df["max_count"] = max_series
     grid_df["max_index"] = idxmax_series
 
     raw_data_lst, frame_num_lst = get_raw_info(file_lst, skip)
