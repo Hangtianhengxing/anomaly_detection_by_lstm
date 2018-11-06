@@ -28,9 +28,10 @@ def load_degree(file_path, round_deg, deg_width):
             degree_dictlst["frame_num"].append(row[0])
             # skip index 0 (the value is frame number)
             if round_deg > 0:
+                # NEED FIX last value is ""
                 time_degree_lst = round_degree(row[1:-1], args.round_deg)
             else:
-                time_degree_lst = np.array(row[1:], dtype="int32")
+                time_degree_lst = np.array(row[1:-1], dtype="int32")
             # calc mean, val of degree for each time
             degree_dictlst["degree_mean"].append(np.mean(time_degree_lst))
             degree_dictlst["degree_std"].append(np.std(time_degree_lst))
@@ -113,7 +114,7 @@ def prep_degree_parse():
 
     # Data Argument
     parser.add_argument("--root_degree_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/20170416/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/20170418/")
    
     # Parameter Argumant
     parser.add_argument("--round_deg", type=int, default=0)
