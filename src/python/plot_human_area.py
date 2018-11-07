@@ -13,7 +13,7 @@ logging.basicConfig(filename=logs_path,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 
-def plot_timeseries(file_path, output_path, property_dict):
+def plot_timeseries(args):
     timeseries_df = pd.read_csv(args.input_path, header=None, names=[args.target_col])
     timeseries_lst = list(timeseries_df[args.target_col])
     plt.figure(figsize=(20, 6))
@@ -25,7 +25,7 @@ def plot_timeseries(file_path, output_path, property_dict):
     plt.grid(True)
     plt.plot(timeseries_lst)
     plt.savefig(args.save_path)
-    logger.debug("SAVE GRAPH: {}".format(args.save_path))
+    logger.debug("SAVE GRAPH: {0}".format(args.save_path))
 
 
 def human_parse():
@@ -56,4 +56,6 @@ def human_parse():
 
 
 if __name__ == "__main__":
-    plot_timeseries(file_path, output_path, property_dict)
+    args = human_parse()
+    logger.debug("Running with args: {0}".format(args))
+    plot_timeseries(args)

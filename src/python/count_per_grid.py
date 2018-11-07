@@ -55,7 +55,7 @@ def count_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
         for y in range(grid_num[1]):
             for x in range(grid_num[0]):
                 count = len(cordinate_df[(cordinate_df["x_g"] == x) & (cordinate_df["y_g"] == y)])
-                count_dict["grid_{}_{}".format(grid_y_index, grid_x_index)] = count
+                count_dict["grid_{0}_{1}".format(grid_y_index, grid_x_index)] = count
                 grid_x_index += 1
             grid_y_index += 1
             grid_x_index = 0
@@ -82,7 +82,7 @@ def count_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
         parts[1::2] = map(int, parts[1::2])
         return parts
 
-    file_lst = sorted(glob.glob(cord_dirc + "*" + extention), key=numerical_sort)
+    file_lst = sorted(glob.glob("{0}*{1}".format(cord_dirc, extention)), key=numerical_sort)
     if len(file_lst) == 0:
         sys.stderr.write("Error: not found cordinate file(.npy)")
         sys.exit(1)
@@ -92,7 +92,7 @@ def count_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
     grid_dictlst = {}
     for grid_y in range(grid_num[1]):
         for grid_x in range(grid_num[0]):
-            grid_dictlst["grid_{}_{}".format(grid_y, grid_x)] = []
+            grid_dictlst["grid_{0}_{1}".format(grid_y, grid_x)] = []
 
     for i in tqdm(range(len(file_lst))):
         cordinate = np.loadtxt(file_lst[i], delimiter=",")
@@ -192,4 +192,5 @@ def grid_parse():
 
 if __name__ == "__main__":
     args = grid_parse()
+    logger.debug("Running with args: {0}".format(args))
     main(args)

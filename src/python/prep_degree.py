@@ -127,4 +127,5 @@ def prep_degree_parse():
 
 if __name__ == "__main__":
     args = prep_degree_parse()
+    logger.debug("Running with args: {0}".format(args))
     prep_degree(args)

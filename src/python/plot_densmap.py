@@ -43,7 +43,7 @@ def plot_kde(args):
     ax.set_ylim([720, 0])
     ax.set_xlim([0, 1280])
     plt.savefig(args.save_path)
-    logger.debug("SAVE FIG: {}".format(args.save_path))
+    logger.debug("SAVE FIG: {0}".format(args.save_path))
 
 
 def gausian_kernel(args):
@@ -73,7 +73,7 @@ def gausian_kernel(args):
 
     plt.imshow(kernel)
     plt.savefig(args.save_path)
-    logger.debug("SAVE FIG: {}".format(args.save_path))
+    logger.debug("SAVE FIG: {0}".format(args.save_path))
 
 
 def densmap_parse():
@@ -102,5 +102,6 @@ def densmap_parse():
 
 if __name__ == "__main__":
     args = densmap_parse()
+    logger.debug("Running with args: {0}".format(args))
     plot_kde(args)
     #gausian_kernel(args)

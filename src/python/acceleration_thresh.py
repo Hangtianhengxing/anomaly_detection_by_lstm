@@ -58,7 +58,7 @@ def acceleration_thresh(args):
     prev_thresh = args.min_value
 
     for time in tqdm(times_lst):
-        stats_df = pd.read_csv(args.root_stats_dirc + time + "/" + args.stats_format + ".csv")
+        stats_df = pd.read_csv("{0}{1}/{2}.csv".format(arg.root_stats_dirc, time, args.stats_format))
         stats_lst = list(stats_df[args.stats_format])
         thresh_dctlst = {"frame_num":list(stats_df["frame_num"]), "acc_thresh":[]}
         for i in range(int(len(stats_lst)/args.window)):
@@ -75,9 +75,9 @@ def acceleration_thresh(args):
             window_thresh_lst = [current_thresh for _ in range(remaining_num)]
             thresh_dctlst["acc_thresh"].extend(window_thresh_lst)
 
-        save_path = args.root_stats_dirc+time+"/acc_thresh.csv"
+        save_path = "{0}{1}/acc_thresh.csv".format(args.root_stats_dirc, time)
         pd.DataFrame(thresh_dctlst).to_csv(save_path, index=False)
-        logger.debug("saved in {}".format(save_path))
+        logger.debug("saved in {0}".format(save_path))
 
 
 def make_acceleration_parse():
@@ -108,5 +108,5 @@ def make_acceleration_parse():
 
 if __name__ == "__main__":
     args = make_acceleration_parse()
-    logger.debug("Running with args: {}".format(args))
+    logger.debug("Running with args: {0}".format(args))
     acceleration_thresh(args)

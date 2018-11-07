@@ -18,24 +18,24 @@ logging.basicConfig(filename=logs_path,
 
 def make_datasets(args):
     # get time series directory list under the root directory
-    times_lst = os.listdir("{}/{}/".format(args.root_stats_dirc, args.date))
-    times_lst = [time for time in times_lst if os.path.isdir("{}/{}/{}/".format(args.root_stats_dirc, args.date, time))]
+    times_lst = os.listdir("{0}/{1}/".format(args.root_stats_dirc, args.date))
+    times_lst = [time for time in times_lst if os.path.isdir("{0}/{1}/{2}/".format(args.root_stats_dirc, args.date, time))]
 
     day_lst = ["Sun", "Mon", "Tue", "Wed", "Thurs", "Fri", "Sat"]
 
     for time_idx in tqdm(times_lst):
-        mean_df = pd.read_csv("{}/{}/{}/mean.csv".format(args.root_stats_dirc, args.date, time_idx))
-        var_df = pd.read_csv("{}/{}/{}/var.csv".format(args.root_stats_dirc, args.date, time_idx))
-        max_df = pd.read_csv("{}/{}/{}/max.csv".format(args.root_stats_dirc, args.date, time_idx))
-        thresh_df = pd.read_csv("{}/{}/{}/acc_thresh.csv".format(args.root_stats_dirc, args.date, time_idx))
-        degree_df = pd.read_csv("{}/{}/{}/prep_degree.csv".format(args.root_stats_dirc, args.date, time_idx))
+        mean_df = pd.read_csv("{0}/{1}/{2}/mean.csv".format(args.root_stats_dirc, args.date, time_idx))
+        var_df = pd.read_csv("{0}/{1}/{2}/var.csv".format(args.root_stats_dirc, args.date, time_idx))
+        max_df = pd.read_csv("{0}/{1}/{2}/max.csv".format(args.root_stats_dirc, args.date, time_idx))
+        thresh_df = pd.read_csv("{0}/{1}/{2}/acc_thresh.csv".format(args.root_stats_dirc, args.date, time_idx))
+        degree_df = pd.read_csv("{0}/{1}/{2}/prep_degree.csv".format(args.root_stats_dirc, args.date, time_idx))
         degree_df = pd.get_dummies(degree_df)
-        grid_df = pd.read_csv("{}/{}/{}.csv".format(args.root_grid_dirc, args.date, time_idx))
+        grid_df = pd.read_csv("{0}/{1}/{2}.csv".format(args.root_grid_dirc, args.date, time_idx))
         grid_df = grid_df.drop(["raw_data", "sum_count"], axis=1)
         grid_df = pd.get_dummies(grid_df)
-        human_df = pd.read_csv("{}/{}/{}.csv".format(args.root_human_dirc, args.date, time_idx))
-        diver_df = pd.read_csv("{}/{}/diver_{}.csv".format(args.root_diver_dirc, args.date, time_idx))
-        feed_df = pd.read_csv("{}/{}/feed_{}.csv".format(args.root_feed_dirc, args.date, time_idx))
+        human_df = pd.read_csv("{0}/{1}/{2}.csv".format(args.root_human_dirc, args.date, time_idx))
+        diver_df = pd.read_csv("{0}/{1}/diver_{2}.csv".format(args.root_diver_dirc, args.date, time_idx))
+        feed_df = pd.read_csv("{0}/{1}/feed_{2}.csv".format(args.root_feed_dirc, args.date, time_idx))
 
         # concat ttime series data
         time_series_df = mean_df
@@ -64,9 +64,9 @@ def make_datasets(args):
                 time_series_df[cur_day] = 0
 
         # save dataset
-        save_path = "{}/{}/time_series_{}.csv".format(args.save_datasets_dirc, args.date, time_idx)
+        save_path = "{0}/{1}/time_series_{2}.csv".format(args.save_datasets_dirc, args.date, time_idx)
         time_series_df.to_csv(save_path, index=False)
-        logger.debug("save dataset: {}".format(save_path))
+        logger.debug("save dataset: {0}".format(save_path))
 
 
 def datasets_parse():
@@ -105,4 +105,5 @@ def datasets_parse():
 
 if __name__ == "__main__":
     args = datasets_parse()
+    logger.debug("Running with args: {0}".format(args))
     make_datasets(args)
