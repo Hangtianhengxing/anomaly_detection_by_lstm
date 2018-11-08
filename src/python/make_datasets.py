@@ -67,6 +67,9 @@ def make_datasets(args):
             else:
                 time_series_df[cur_day] = 0
 
+        # select row for every interval
+        time_series_df = time_series_df.iloc[[i for i in range(0, len(time_series_df), args.interval)]]
+
         # save dataset
         save_path = "{0}/{1}/time_series_{2}.csv".format(args.save_datasets_dirc, args.date, time_idx)
         time_series_df.to_csv(save_path, index=False)
@@ -100,7 +103,8 @@ def datasets_parse():
                         default="/Users/sakka/cnn_anomaly_detection/data/datasets/")
 
     # Parameter Argument
-    parser.add_argument("--pred_time", type=int, default=5*60*30, help="how many frame after anormaly is detected (sec*FPS)")
+    parser.add_argument("--pred_time", type=int, default=0, help="how many frame after anormaly is detected (sec*FPS)")
+    parser.add_argument("--interval", type=int, default=30, help="interval of dataset row")
 
     args = parser.parse_args()
 
