@@ -47,6 +47,7 @@ def make_datasets(args):
         time_series_df = pd.merge(time_series_df, human_df,  on="frame_num")
         time_series_df = pd.merge(time_series_df, diver_df, on="frame_num")
         time_series_df = pd.merge(time_series_df, feed_df, on="frame_num")
+        time_series_df = time_series_df.drop("frame_num", axis=1)
 
         # make answer label
         time_series_df["label"] = pd.Series(
