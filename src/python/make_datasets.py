@@ -57,6 +57,9 @@ def make_datasets(args):
             start_idx = end_idx - args.pred_time if end_idx > args.pred_time else 0
             time_series_df.loc[start_idx:end_idx, "label"] = 1
 
+        logger.debug("Normal: {0}".format(len(time_series_df[time_series_df["label"] == 0])))
+        logger.debug("Anormal: {0}".format(len(time_series_df[time_series_df["label"] == 1])))
+
         # weekly infomation
         for cur_day in day_lst:
             if cur_day == args.day:
