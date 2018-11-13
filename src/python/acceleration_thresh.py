@@ -58,7 +58,7 @@ def acceleration_thresh(args):
     prev_thresh = args.min_value
 
     for time in tqdm(times_lst):
-        stats_df = pd.read_csv("{0}{1}/{2}.csv".format(arg.root_stats_dirc, time, args.stats_format))
+        stats_df = pd.read_csv("{0}{1}/{2}.csv".format(args.root_stats_dirc, time, args.stats_format))
         stats_lst = list(stats_df[args.stats_format])
         thresh_dctlst = {"frame_num":list(stats_df["frame_num"]), "acc_thresh":[]}
         for i in range(int(len(stats_lst)/args.window)):
