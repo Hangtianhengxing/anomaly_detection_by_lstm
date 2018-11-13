@@ -90,17 +90,17 @@ def datasets_parse():
     parser.add_argument("--day", type=str, default="Sun",
                         help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
     parser.add_argument("--root_stats_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/statistics")
     parser.add_argument("--root_grid_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/grid_count/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/grid_count")
     parser.add_argument("--root_human_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/human_area/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/human_area")
     parser.add_argument("--root_feed_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/feed/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/feed")
     parser.add_argument("--root_diver_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/diver/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/diver")
     parser.add_argument("--save_datasets_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/datasets/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/datasets")
 
     # Parameter Argument
     parser.add_argument("--pred_time", type=int, default=0, help="how many frame after anormaly is detected (sec*FPS)")
