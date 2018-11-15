@@ -156,7 +156,7 @@ def plot(value_lst, args):
 
 def main(args):
     grid_df = ratio_per_grid(args.cord_dirc, args.extention, args.skip, args.grid_num)
-    plot(list(grid_df["max"]), args)
+    #plot(list(grid_df["max"]), args)
 
 
 def grid_parse():
@@ -170,12 +170,12 @@ def grid_parse():
 
     # Data Argument
     parser.add_argument("--cord_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/cord/20170416/9/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/cord/20170416/10/")
     parser.add_argument("--extention", type=str, default=".csv")
     parser.add_argument("--save_grid_path", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/grid_count/20170416/9.csv")
+                        default="/Users/sakka/cnn_anomaly_detection/data/grid_ratio/20170416/10.csv")
     parser.add_argument("--save_img_path", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/image/grid_count/20170416/9.png")
+                        default="/Users/sakka/cnn_anomaly_detection/image/grid_ratio/20170416/10.png")
 
     # Parameter Argument
     parser.add_argument("--grid_num", type=tuple, default=(8, 1))
