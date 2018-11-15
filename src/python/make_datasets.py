@@ -16,6 +16,16 @@ logging.basicConfig(filename=logs_path,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 
+def normalize(df, col_lst):
+    result_df = df.copy()
+    for col in col_lst:
+        max_value = df[col].max()
+        min_value = df[col].min()
+        result_df[col] = (df[col] - min_value) / (max_value - min_value)
+
+    return result_df
+
+
 def make_datasets(args):
     # get time series directory list under the root directory
     times_lst = os.listdir("{0}/{1}/".format(args.root_stats_dirc, args.date))
@@ -29,9 +39,10 @@ def make_datasets(args):
         max_df = pd.read_csv("{0}/{1}/{2}/max.csv".format(args.root_stats_dirc, args.date, time_idx))
         thresh_df = pd.read_csv("{0}/{1}/{2}/acc_thresh.csv".format(args.root_stats_dirc, args.date, time_idx))
         degree_df = pd.read_csv("{0}/{1}/{2}/prep_degree.csv".format(args.root_stats_dirc, args.date, time_idx))
+        defree_df = degree_df.drop(["degree_mean"], axis=1)
         degree_df = pd.get_dummies(degree_df)
         grid_df = pd.read_csv("{0}/{1}/{2}.csv".format(args.root_grid_dirc, args.date, time_idx))
-        grid_df = grid_df.drop(["raw_data", "sum_count"], axis=1)
+        grid_df = grid_df.drop(["max", "raw_data"], axis=1)
         grid_df = pd.get_dummies(grid_df)
         human_df = pd.read_csv("{0}/{1}/{2}.csv".format(args.root_human_dirc, args.date, time_idx))
         diver_df = pd.read_csv("{0}/{1}/diver_{2}.csv".format(args.root_diver_dirc, args.date, time_idx))
@@ -70,8 +81,16 @@ def make_datasets(args):
         # select row for every interval
         time_series_df = time_series_df.iloc[[i for i in range(0, len(time_series_df), args.interval)]]
 
+        # normalize dataset
+        if args.normalize:
+            col_lst = ["mean", "var", "max", "degree_std"]
+            time_series_df = normalize(time_series_df, col_lst)
+
         # save dataset
-        save_path = "{0}/{1}/time_series_{2}.csv".format(args.save_datasets_dirc, args.date, time_idx)
+        if args.normalize:
+            save_path = "{0}/{1}/normalize/time_series_{2}.csv".format(args.save_datasets_dirc, args.date, time_idx)
+        else:
+            save_path = "{0}/{1}/default/time_series_{2}.csv".format(args.save_datasets_dirc, args.date, time_idx)
         time_series_df.to_csv(save_path, index=False)
         logger.debug("save dataset: {0}".format(save_path))
 
@@ -87,12 +106,12 @@ def datasets_parse():
 
     # Data Argument
     parser.add_argument("--date", type=str, default="20170416")
-    parser.add_argument("--day", type=str, default="Sun",
+    parser.add_argument("--day", type=str, default="Fri",
                         help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
     parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics")
     parser.add_argument("--root_grid_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/grid_count")
+                        default="/Users/sakka/cnn_anomaly_detection/data/grid_ratio")
     parser.add_argument("--root_human_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/human_area")
     parser.add_argument("--root_feed_dirc", type=str,
@@ -105,7 +124,7 @@ def datasets_parse():
     # Parameter Argument
     parser.add_argument("--pred_time", type=int, default=0, help="how many frame after anormaly is detected (sec*FPS)")
     parser.add_argument("--interval", type=int, default=30, help="interval of dataset row")
-
+    parser.add_argument("--normalize", type=bool, default=True, help="whether normalize or not for dataset")
     args = parser.parse_args()
 
     return args
