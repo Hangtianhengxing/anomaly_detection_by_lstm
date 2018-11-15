@@ -111,7 +111,7 @@ def datasets_parse():
     parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics")
     parser.add_argument("--root_grid_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/grid_count")
+                        default="/Users/sakka/cnn_anomaly_detection/data/grid_ratio")
     parser.add_argument("--root_human_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/human_area")
     parser.add_argument("--root_feed_dirc", type=str,
