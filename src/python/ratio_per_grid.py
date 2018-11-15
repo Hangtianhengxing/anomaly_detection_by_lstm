@@ -170,12 +170,12 @@ def grid_parse():
 
     # Data Argument
     parser.add_argument("--cord_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/cord/20170416/10/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/cord/20170416/9/")
     parser.add_argument("--extention", type=str, default=".csv")
     parser.add_argument("--save_grid_path", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/grid_ratio/20170416/10.csv")
+                        default="/Users/sakka/cnn_anomaly_detection/data/grid_ratio/20170416/9.csv")
     parser.add_argument("--save_img_path", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/image/grid_ratio/20170416/10.png")
+                        default="/Users/sakka/cnn_anomaly_detection/image/grid_ratio/20170416/9.png")
 
     # Parameter Argument
     parser.add_argument("--grid_num", type=tuple, default=(8, 1))

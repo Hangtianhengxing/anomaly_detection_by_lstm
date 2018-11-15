@@ -106,7 +106,7 @@ def datasets_parse():
 
     # Data Argument
     parser.add_argument("--date", type=str, default="20170416")
-    parser.add_argument("--day", type=str, default="Fri",
+    parser.add_argument("--day", type=str, default="Sun",
                         help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
     parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics")
