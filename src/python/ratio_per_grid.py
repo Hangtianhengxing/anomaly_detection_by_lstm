@@ -12,13 +12,13 @@ import glob
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
-logs_path = "/Users/sakka/cnn_anomaly_detection/logs/count_per_grid.log"
+logs_path = "/Users/sakka/cnn_anomaly_detection/logs/ratio_per_grid.log"
 logging.basicConfig(filename=logs_path,
                     level=logging.DEBUG,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 
-def count_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
+def ratio_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
     """
     save data that counted oubject per grid
 
@@ -49,18 +49,18 @@ def count_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
         cordinate_df["x_g"] = (cordinate_df["x"]/grid_size[0]).astype(np.int32)
         cordinate_df["y_g"] = (cordinate_df["y"]/grid_size[1]).astype(np.int32)
 
-        count_dict = {}
+        cnt_dict = {}
         grid_y_index = 0
         grid_x_index = 0
         for y in range(grid_num[1]):
             for x in range(grid_num[0]):
                 count = len(cordinate_df[(cordinate_df["x_g"] == x) & (cordinate_df["y_g"] == y)])
-                count_dict["grid_{0}_{1}".format(grid_y_index, grid_x_index)] = count
+                cnt_dict["grid_{0}_{1}".format(grid_y_index, grid_x_index)] = count
                 grid_x_index += 1
             grid_y_index += 1
             grid_x_index = 0
 
-        return count_dict
+        return cnt_dict
 
     def get_raw_info(file_lst, skip):
         """
@@ -97,16 +97,16 @@ def count_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
     for i in tqdm(range(len(file_lst))):
         cordinate = np.loadtxt(file_lst[i], delimiter=",")
         cordinate_df = pd.DataFrame(cordinate, columns=["x", "y"]).astype(np.int32)
-        count_dict = count_feature(cordinate_df, grid_num)
-        for key, value in count_dict.items():
-            grid_dictlst[key].extend([value for _ in range(skip)])
+        cnt_dict = count_feature(cordinate_df, grid_num)
+        # conver count to ratio and complement to interval frame
+        total_cnt = sum(cnt_dict.values())
+        for key, value in cnt_dict.items():
+            grid_dictlst[key].extend([value/total_cnt for _ in range(skip)])
 
     grid_df = pd.DataFrame(grid_dictlst)
-    sum_series = grid_df.sum(axis=1)
     max_series = grid_df.max(axis=1)
     idxmax_series = grid_df.idxmax(axis=1)
-    grid_df["sum_count"] = sum_series
-    grid_df["max_count"] = max_series
+    grid_df["max"] = max_series
     grid_df["max_index"] = idxmax_series
 
     raw_data_lst, frame_num_lst = get_raw_info(file_lst, skip)
@@ -155,13 +155,13 @@ def plot(value_lst, args):
 
 
 def main(args):
-    grid_df = count_per_grid(args.cord_dirc, args.extention, args.skip, args.grid_num)
-    plot(list(grid_df["max"]/grid_df["sum"]), args)
+    grid_df = ratio_per_grid(args.cord_dirc, args.extention, args.skip, args.grid_num)
+    plot(list(grid_df["max"]), args)
 
 
 def grid_parse():
     parser = argparse.ArgumentParser(
-        prog="count_per_grid.py",
+        prog="ratio_per_grid.py",
         usage="",
         description="description",
         epilog="end",
