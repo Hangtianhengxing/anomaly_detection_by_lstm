@@ -51,14 +51,14 @@ def acceleration_thresh(args):
     """
     
     # get time series directory list under the root directory
-    times_lst = os.listdir(args.root_stats_dirc)
-    times_lst = [time for time in times_lst if os.path.isdir(args.root_stats_dirc + time)]
+    times_lst = os.listdir("{0}/".format(args.root_stats_dirc))
+    times_lst = [time for time in times_lst if os.path.isdir("{0}/{1}".format(args.root_stats_dirc, time))]
 
     # when the condition is NOT satisfied, the threshold use before one step
     prev_thresh = args.min_value
 
     for time in tqdm(times_lst):
-        stats_df = pd.read_csv("{0}{1}/{2}.csv".format(args.root_stats_dirc, time, args.stats_format))
+        stats_df = pd.read_csv("{0}/{1}/{2}.csv".format(args.root_stats_dirc, time, args.stats_format))
         stats_lst = list(stats_df[args.stats_format])
         thresh_dctlst = {"frame_num":list(stats_df["frame_num"]), "acc_thresh":[]}
         for i in range(int(len(stats_lst)/args.window)):
@@ -75,7 +75,7 @@ def acceleration_thresh(args):
             window_thresh_lst = [current_thresh for _ in range(remaining_num)]
             thresh_dctlst["acc_thresh"].extend(window_thresh_lst)
 
-        save_path = "{0}{1}/acc_thresh.csv".format(args.root_stats_dirc, time)
+        save_path = "{0}/{1}/acc_thresh.csv".format(args.root_stats_dirc, time)
         pd.DataFrame(thresh_dctlst).to_csv(save_path, index=False)
         logger.debug("saved in {0}".format(save_path))
 
@@ -91,18 +91,17 @@ def make_acceleration_parse():
 
     # Data Argument
     parser.add_argument("--root_stats_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/20170416/")
+                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/20170416")
     parser.add_argument("--stats_format", type=str,
                         default="max", help="select from mean, val, max")
    
     # Parameter Argumant
-    parser.add_argument("--weight", type=float, default=2.1)
+    parser.add_argument("--weight", type=float, default=2.4)
     parser.add_argument("--window", type=int, default=30*60*5)
-    parser.add_argument("--min_value", type=int, default=100)
+    parser.add_argument("--min_value", type=int, default=150)
     parser.add_argument("--max_value", type=int, default=400)
 
     args = parser.parse_args()
-
     return args
 
 
