@@ -34,6 +34,7 @@ def calc_thresh(value_lst, weight, window, min_value, max_value, prev_thresh):
     if pad_size > 0:
         pad_lst = [0 for _ in range(pad_size)]
         value_lst = pad_lst + value_lst
+    
     thresh = weight * np.mean(value_lst[-window:])
 
     # condition
@@ -100,7 +101,6 @@ def make_acceleration_parse():
     parser.add_argument("--window", type=int, default=30*60*5)
     parser.add_argument("--min_value", type=int, default=150)
     parser.add_argument("--max_value", type=int, default=400)
-
     args = parser.parse_args()
     return args
 

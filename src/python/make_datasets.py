@@ -32,6 +32,7 @@ def make_datasets(args):
     times_lst = [time for time in times_lst if os.path.isdir("{0}/{1}/{2}/".format(args.root_stats_dirc, args.date, time))]
 
     day_lst = ["Sun", "Mon", "Tue", "Wed", "Thurs", "Fri", "Sat"]
+    time_lst = [str(i) for i in range(9, 17)]
 
     for time_idx in tqdm(times_lst):
         mean_df = pd.read_csv("{0}/{1}/{2}/mean.csv".format(args.root_stats_dirc, args.date, time_idx))
@@ -70,6 +71,13 @@ def make_datasets(args):
 
         logger.debug("Normal: {0}".format(len(time_series_df[time_series_df["label"] == 0])))
         logger.debug("Anormal: {0}".format(len(time_series_df[time_series_df["label"] == 1])))
+
+        # time information
+        for cur_time in time_lst:
+            if cur_time == time_idx:
+                time_series_df[cur_time] = 1
+            else:
+                time_series_df[cur_time] = 0
 
         # weekly infomation
         for cur_day in day_lst:
@@ -124,7 +132,7 @@ def datasets_parse():
     # Parameter Argument
     parser.add_argument("--pred_time", type=int, default=0, help="how many frame after anormaly is detected (sec*FPS)")
     parser.add_argument("--interval", type=int, default=30, help="interval of dataset row")
-    parser.add_argument("--normalize", type=bool, default=True, help="whether normalize or not for dataset")
+    parser.add_argument("--normalize", type=bool, default=False, help="whether normalize or not for dataset")
     args = parser.parse_args()
 
     return args
