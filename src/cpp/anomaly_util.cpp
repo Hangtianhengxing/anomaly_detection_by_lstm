@@ -20,7 +20,7 @@ using std::string;
 void display_info(string input_file_path, int width, int height, int total_frame, int fourcc, double fps){
     // display information of input file
     cout << "\n*******************************************" << endl;
-    cout << "MOVIE PATH: " << input_file_path << endl;
+    cout << "VIDEO PATH: " << input_file_path << endl;
     cout << "WIDTH: " << width << endl;
     cout << "HEIGHT: " << height << endl;
     cout << "TOTAL FRAME: " << total_frame << endl;

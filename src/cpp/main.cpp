@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     string output_frame_num_path;
 
     // receive processing file path from standard input
-    // cout << "Input movie file path: ";
+    // cout << "Input video file path: ";
     // cin >> input_file_path;
     // cout << "Human mask path: ";
     // cin >> human_mask_path;
@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
 
     string input_root_dirc;
     string output_root_dirc;
-    //input_root_dirc = "/Users/sakka/cnn_anomaly_detection/movie/20170422/";
-    input_root_dirc = "/Users/sakka/cnn_tracking/movie/20170422/";
+    //input_root_dirc = "/Users/sakka/cnn_anomaly_detection/video/20170422/";
+    input_root_dirc = "/Users/sakka/cnn_tracking/video/20170422/";
     human_mask_path = "/Users/sakka/cnn_anomaly_detection/image/human_mask.png";
     output_root_dirc = "/Users/sakka/cnn_anomaly_detection/data/human_area/20170422/";
 
