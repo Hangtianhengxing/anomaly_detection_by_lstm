@@ -40,7 +40,6 @@ def make_datasets(args):
         max_df = pd.read_csv("{0}/{1}/{2}/max.csv".format(args.root_stats_dirc, args.date, time_idx))
         thresh_df = pd.read_csv("{0}/{1}/{2}/acc_thresh.csv".format(args.root_stats_dirc, args.date, time_idx))
         degree_df = pd.read_csv("{0}/{1}/{2}/prep_degree.csv".format(args.root_stats_dirc, args.date, time_idx))
-        defree_df = degree_df.drop(["degree_mean"], axis=1)
         degree_df = pd.get_dummies(degree_df)
         grid_df = pd.read_csv("{0}/{1}/{2}.csv".format(args.root_grid_dirc, args.date, time_idx))
         grid_df = grid_df.drop(["max", "raw_data"], axis=1)
@@ -89,9 +88,16 @@ def make_datasets(args):
         # select row for every interval
         time_series_df = time_series_df.iloc[[i for i in range(0, len(time_series_df), args.interval)]]
 
+        # shift feature
+        shift_col_lst = ["mean", "var", "max", "degree_mean", "degree_std"]
+        for shift_col in shift_col_lst:
+            time_series_df["{0}_shift1".format(shift_col)] = time_series_df[shift_col] - time_series_df[shift_col].shift()
+
+        time_series_df = time_series_df.dropna()
+
         # normalize dataset
         if args.normalize:
-            col_lst = ["mean", "var", "max", "degree_std"]
+            col_lst = ["mean", "var", "max", "degree_mean","degree_std"]
             time_series_df = normalize(time_series_df, col_lst)
 
         # save dataset
