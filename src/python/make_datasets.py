@@ -75,9 +75,9 @@ def make_datasets(args):
         # time information
         for cur_time in time_lst:
             if cur_time == time_idx:
-                time_series_df[cur_time] = 1
+                time_series_df["hour_{0}".format(cur_time)] = 1
             else:
-                time_series_df[cur_time] = 0
+                time_series_df["hour_{0}".format(cur_time)] = 0
 
         # weekly infomation
         for cur_day in day_lst:
