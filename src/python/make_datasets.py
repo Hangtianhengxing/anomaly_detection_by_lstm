@@ -26,6 +26,30 @@ def normalize(df, col_lst):
     return result_df
 
 
+def leveled_labels(label_df):
+    """
+    5: acceralation
+    4: after 30 sec (30 frame)
+    3: after 5 min (300 frame)
+    2: after 10 min (600 frame)
+    1: other
+    """
+    label_arr = np.array(label_df)
+    label_arr[label_arr == 1] = 5
+    label_arr[label_arr == 0] = 1
+    flag_idx = np.where(label_arr == 5)[0]
+
+    width2label = {600: 2, 300: 3, 30: 4}
+
+    for width, label in width2label.items():
+        for end_idx in flag_idx:
+            start_idx = max(0, end_idx - width)
+            label_arr[start_idx:end_idx] = label
+
+    label_arr[flag_idx] = 5
+    return label_arr
+
+
 def make_datasets(args):
     # get time series directory list under the root directory
     times_lst = os.listdir("{0}/{1}/".format(args.root_stats_dirc, args.date))
@@ -68,8 +92,19 @@ def make_datasets(args):
             start_idx = end_idx - args.pred_time if end_idx > args.pred_time else 0
             time_series_df.loc[start_idx:end_idx, "label"] = 1
 
-        logger.debug("Normal: {0}".format(len(time_series_df[time_series_df["label"] == 0])))
-        logger.debug("Anormal: {0}".format(len(time_series_df[time_series_df["label"] == 1])))
+        # devide into levels
+        if args.leveled:
+            time_series_df["label"] = leveled_labels(time_series_df["label"])
+            logger.debug("label is devided into 5 levels")
+            logger.debug("Level 1: {0}".format(len(time_series_df[time_series_df["label"] == 1])))
+            logger.debug("Level 2: {0}".format(len(time_series_df[time_series_df["label"] == 2])))
+            logger.debug("Level 3: {0}".format(len(time_series_df[time_series_df["label"] == 3])))
+            logger.debug("Level 4: {0}".format(len(time_series_df[time_series_df["label"] == 4])))
+            logger.debug("Level 5: {0}".format(len(time_series_df[time_series_df["label"] == 5])))
+        else:
+            logger.debug("label is not devided into levels.")
+            logger.debug("Normal: {0}".format(len(time_series_df[time_series_df["label"] == 0])))
+            logger.debug("Anormal: {0}".format(len(time_series_df[time_series_df["label"] == 1])))
 
         # time information
         for cur_time in time_lst:
@@ -92,7 +127,6 @@ def make_datasets(args):
         shift_col_lst = ["mean", "var", "max", "degree_mean", "degree_std"]
         for shift_col in shift_col_lst:
             time_series_df["{0}_shift1".format(shift_col)] = time_series_df[shift_col] - time_series_df[shift_col].shift()
-
         time_series_df = time_series_df.dropna()
 
         # normalize dataset
@@ -139,6 +173,7 @@ def datasets_parse():
     parser.add_argument("--pred_time", type=int, default=0, help="how many frame after anormaly is detected (sec*FPS)")
     parser.add_argument("--interval", type=int, default=30, help="interval of dataset row")
     parser.add_argument("--normalize", type=bool, default=False, help="whether normalize or not for dataset")
+    parser.add_argument("--leveled", type=bool, default=False, help="whether or not to devide answer label into levels ")
     args = parser.parse_args()
 
     return args
