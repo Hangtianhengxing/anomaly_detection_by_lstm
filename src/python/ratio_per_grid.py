@@ -2,6 +2,7 @@
 #coding: utf-8
 
 import sys
+import os
 import re
 import logging
 import numpy as np
@@ -18,7 +19,7 @@ logging.basicConfig(filename=logs_path,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 
-def ratio_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
+def ratio_per_grid(cord_dirc, save_grid_path, extention, skip, grid_num=(8,1)):
     """
     save data that counted oubject per grid
 
@@ -82,9 +83,9 @@ def ratio_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
         parts[1::2] = map(int, parts[1::2])
         return parts
 
-    file_lst = sorted(glob.glob("{0}*{1}".format(cord_dirc, extention)), key=numerical_sort)
+    file_lst = sorted(glob.glob("{0}/*{1}".format(cord_dirc, extention)), key=numerical_sort)
     if len(file_lst) == 0:
-        sys.stderr.write("Error: not found cordinate file(.npy)")
+        sys.stderr.write("Error: not found cordinate file({0})".format(args.extention))
         sys.exit(1)
     else:
         pass
@@ -115,7 +116,7 @@ def ratio_per_grid(cord_dirc, extention, skip, grid_num=(8,1)):
     assert len(grid_df) == len(frame_num_lst)
     grid_df["frame_num"] = frame_num_lst
 
-    grid_df.to_csv(args.save_grid_path, index=False)
+    grid_df.to_csv(save_grid_path, index=False)
 
     return grid_df
 
@@ -151,12 +152,18 @@ def plot(value_lst, args):
     set_graph(value_lst)
     plt.savefig(args.save_img_path)
 
-    logger.debug("SAVE: graph({})".format(args.save_img_path))
+    logger.debug("SAVE: graph({0})".format(args.save_img_path))
 
 
 def main(args):
-    grid_df = ratio_per_grid(args.cord_dirc, args.extention, args.skip, args.grid_num)
-    #plot(list(grid_df["max"]), args)
+    os.makedirs(args.save_grid_dirc, exist_ok=True)
+    for time_idx in range(9, 17):
+        cord_dirc = "{0}/{1}".format(args.root_cord_dirc, time_idx)
+        save_grid_path = "{0}/{1}.csv".format(args.save_grid_dirc, time_idx)
+        grid_df = ratio_per_grid(cord_dirc, save_grid_path, args.extention, args.skip, args.grid_num)
+
+        save_img_path = "{0}/{1}.png".format(args.save_img_path, time_idx)
+        #plot(list(grid_df["max"]), save_img_path,args)
 
 
 def grid_parse():
@@ -169,13 +176,13 @@ def grid_parse():
     )
 
     # Data Argument
-    parser.add_argument("--cord_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/cord/20170416/9/")
+    parser.add_argument("--root_cord_dirc", type=str,
+                        default="/Users/sakka/cnn_anomaly_detection/data/cord/20170416")
     parser.add_argument("--extention", type=str, default=".csv")
-    parser.add_argument("--save_grid_path", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/grid_ratio/20170416/9.csv")
+    parser.add_argument("--save_grid_dirc", type=str,
+                        default="/Users/sakka/cnn_anomaly_detection/data/grid_ratio/20170416")
     parser.add_argument("--save_img_path", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/image/grid_ratio/20170416/9.png")
+                        default="/Users/sakka/cnn_anomaly_detection/image/grid_ratio/20170416")
 
     # Parameter Argument
     parser.add_argument("--grid_num", type=tuple, default=(8, 1))
