@@ -15,7 +15,7 @@ using std::string;
 
 extern void display_info(string, int, int, int, int, double);
 extern cv::Mat read_mask(string, bool);
-extern void write_csv(std::vector<float>&, string);
+extern void write_csv(std::vector<float> &, std::vector<int> &, std::vector<string> &, string);
 extern void save_frame_num(std::vector<int>&, string);
 
 
@@ -57,7 +57,7 @@ float calc_area_ratio(cv::Mat &img, cv::Mat &bin_mask) {
 }
 
 
-void human_area(string input_file_path, string human_mask_path, string output_human_path, string output_frame_num_path) {
+void human_area(string input_file_path, string human_mask_path, string output_human_path) {
     cv::VideoCapture capture(input_file_path);
     int width = (int)capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int height = (int)capture.get(CV_CAP_PROP_FRAME_HEIGHT);
@@ -112,8 +112,8 @@ void human_area(string input_file_path, string human_mask_path, string output_hu
     }
     cv::destroyAllWindows();
 
-    write_csv(human_vec, output_human_path);
-    save_frame_num(frame_vec, output_frame_num_path);
+    std::vector<string> human_header{"frame_num", "area_ratio"};
+    write_csv(human_vec, frame_vec, human_header, output_human_path);
     cout << "Done: save human area data." << endl;
 
 }

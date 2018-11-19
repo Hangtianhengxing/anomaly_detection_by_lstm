@@ -79,29 +79,39 @@ void read_csv(string input_csv_file_path, std::vector<std::vector <int> > &table
 }
 
 
-void write_csv(std::vector<float> &vec_data, string output_csv_file_path) {
+void write_csv(std::vector<float> &data_vec, std::vector<int> &frame_num_vec,
+               std::vector<string> &header_vec, string output_csv_path) {
     /**
      * write csv file by vector data
      * 
      * input:
-     *   vec_data: 
-     *   output_csv_file_path: absolute path
+     *   data_vec             : vector of target value (mean, var, max)
+     *   frame_num_vec        : record from which frame the value of vector was generated
+     *   output_csv_file_path : absolute path
     **/
 
-    std::ofstream ofs(output_csv_file_path);
-    if (ofs) {
-        for (unsigned int i = 0; i < vec_data.size(); ++i) {
-            ofs << vec_data[i] << endl;
+    // check vector size
+    assert(data_vec.size() <= frame_num_vec.size());
+
+    std::ofstream ofs(output_csv_path);
+    if (ofs)
+    {
+        // insert header
+        ofs << header_vec.at(0) << "," << header_vec.at(1) << endl;
+        for (unsigned int i = 0; i < data_vec.size(); ++i)
+        {
+            ofs << frame_num_vec.at(i) << "," << data_vec.at(i) << endl;
         }
     }
-    else {
-        cout << "ERROR: can not open file. please check file path." << endl;
-        cout << "PATH: " << output_csv_file_path << endl;
+    else
+    {
+        cout << "ERROR: can not open file (output csv). please check file path." << endl;
+        cout << "PATH: " << output_csv_path << endl;
         exit(1);
     }
 
     ofs.close();
-    cout << "SAVE PATH: " << output_csv_file_path << endl;
+    cout << "DONE: " << output_csv_path << endl;
 }
 
 
