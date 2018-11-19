@@ -59,18 +59,27 @@ def make_datasets(args):
     time_lst = [str(i) for i in range(9, 17)]
 
     for time_idx in tqdm(times_lst):
-        mean_df = pd.read_csv("{0}/{1}/{2}/mean.csv".format(args.root_stats_dirc, args.date, time_idx))
-        var_df = pd.read_csv("{0}/{1}/{2}/var.csv".format(args.root_stats_dirc, args.date, time_idx))
-        max_df = pd.read_csv("{0}/{1}/{2}/max.csv".format(args.root_stats_dirc, args.date, time_idx))
-        thresh_df = pd.read_csv("{0}/{1}/{2}/acc_thresh.csv".format(args.root_stats_dirc, args.date, time_idx))
-        degree_df = pd.read_csv("{0}/{1}/{2}/prep_degree.csv".format(args.root_stats_dirc, args.date, time_idx))
+        mean_df = pd.read_csv("{0}/{1}/{2}/mean.csv".format(
+            args.root_stats_dirc, args.date, time_idx))
+        var_df = pd.read_csv("{0}/{1}/{2}/var.csv".format(
+            args.root_stats_dirc, args.date, time_idx))
+        max_df = pd.read_csv("{0}/{1}/{2}/max.csv".format(
+            args.root_stats_dirc, args.date, time_idx))
+        thresh_df = pd.read_csv("{0}/{1}/{2}/acc_thresh.csv".format(
+            args.root_stats_dirc, args.date, time_idx))
+        degree_df = pd.read_csv("{0}/{1}/{2}/prep_degree.csv".format(
+            args.root_stats_dirc, args.date, time_idx))
         degree_df = pd.get_dummies(degree_df)
-        grid_df = pd.read_csv("{0}/{1}/{2}.csv".format(args.root_grid_dirc, args.date, time_idx))
+        grid_df = pd.read_csv("{0}/{1}/{2}.csv".format(
+            args.root_grid_dirc, args.date, time_idx))
         grid_df = grid_df.drop(["max", "raw_data"], axis=1)
         grid_df = pd.get_dummies(grid_df)
-        human_df = pd.read_csv("{0}/{1}/{2}.csv".format(args.root_human_dirc, args.date, time_idx))
-        diver_df = pd.read_csv("{0}/{1}/diver_{2}.csv".format(args.root_diver_dirc, args.date, time_idx))
-        feed_df = pd.read_csv("{0}/{1}/feed_{2}.csv".format(args.root_feed_dirc, args.date, time_idx))
+        human_df = pd.read_csv("{0}/{1}/{2}.csv".format(
+            args.root_human_dirc, args.date, time_idx))
+        diver_df = pd.read_csv("{0}/{1}/diver_{2}.csv".format(
+            args.root_diver_dirc, args.date, time_idx))
+        feed_df = pd.read_csv("{0}/{1}/feed_{2}.csv".format(
+            args.root_feed_dirc, args.date, time_idx))
 
         # concat ttime series data
         time_series_df = mean_df
@@ -92,19 +101,7 @@ def make_datasets(args):
             start_idx = end_idx - args.pred_time if end_idx > args.pred_time else 0
             time_series_df.loc[start_idx:end_idx, "label"] = 1
 
-        # devide into levels
-        if args.leveled:
-            time_series_df["label"] = leveled_labels(time_series_df["label"])
-            logger.debug("label is devided into 5 levels")
-            logger.debug("Level 1: {0}".format(len(time_series_df[time_series_df["label"] == 1])))
-            logger.debug("Level 2: {0}".format(len(time_series_df[time_series_df["label"] == 2])))
-            logger.debug("Level 3: {0}".format(len(time_series_df[time_series_df["label"] == 3])))
-            logger.debug("Level 4: {0}".format(len(time_series_df[time_series_df["label"] == 4])))
-            logger.debug("Level 5: {0}".format(len(time_series_df[time_series_df["label"] == 5])))
-        else:
-            logger.debug("label is not devided into levels.")
-            logger.debug("Normal: {0}".format(len(time_series_df[time_series_df["label"] == 0])))
-            logger.debug("Anormal: {0}".format(len(time_series_df[time_series_df["label"] == 1])))
+
 
         # time information
         for cur_time in time_lst:
@@ -123,6 +120,27 @@ def make_datasets(args):
         # select row for every interval
         time_series_df = time_series_df.iloc[[i for i in range(0, len(time_series_df), args.interval)]]
 
+        # devide into levels
+        if args.leveled:
+            time_series_df["label"] = leveled_labels(time_series_df["label"])
+            logger.debug("label is devided into 5 levels")
+            logger.debug("Level 1: {0}".format(
+                len(time_series_df[time_series_df["label"] == 1])))
+            logger.debug("Level 2: {0}".format(
+                len(time_series_df[time_series_df["label"] == 2])))
+            logger.debug("Level 3: {0}".format(
+                len(time_series_df[time_series_df["label"] == 3])))
+            logger.debug("Level 4: {0}".format(
+                len(time_series_df[time_series_df["label"] == 4])))
+            logger.debug("Level 5: {0}".format(
+                len(time_series_df[time_series_df["label"] == 5])))
+        else:
+            logger.debug("label is not devided into levels.")
+            logger.debug("Normal: {0}".format(
+                len(time_series_df[time_series_df["label"] == 0])))
+            logger.debug("Anormal: {0}".format(
+                len(time_series_df[time_series_df["label"] == 1])))
+
         # shift feature
         shift_col_lst = ["mean", "var", "max", "degree_mean", "degree_std"]
         for shift_col in shift_col_lst:
@@ -136,9 +154,11 @@ def make_datasets(args):
 
         # save dataset
         if args.normalize:
-            save_path = "{0}/{1}/normalize/time_series_{2}.csv".format(args.save_datasets_dirc, args.date, time_idx)
+            save_path = "{0}/{1}/normalize/time_series_{2}.csv".format(
+                args.save_datasets_dirc, args.date, time_idx)
         else:
-            save_path = "{0}/{1}/default/time_series_{2}.csv".format(args.save_datasets_dirc, args.date, time_idx)
+            save_path = "{0}/{1}/default/time_series_leveled_{2}.csv".format(
+                args.save_datasets_dirc, args.date, time_idx)
         time_series_df.to_csv(save_path, index=False)
         logger.debug("save dataset: {0}".format(save_path))
 
