@@ -100,7 +100,7 @@ def prep_degree(args):
         degree_df = load_degree(args.root_degree_dirc+"{}/degree.csv".format(time_idx), args.round_deg, args.deg_width)
         save_degree_path = args.root_degree_dirc + "{}/prep_degree.csv".format(time_idx)
         degree_df.to_csv(save_degree_path, index=False)
-        logger.debug("save in {}".format(save_degree_path))
+        logger.debug("save in {0}".format(save_degree_path))
 
 
 def prep_degree_parse():
