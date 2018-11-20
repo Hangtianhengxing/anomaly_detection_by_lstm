@@ -111,8 +111,8 @@ void human_area(string input_file_path, string human_mask_path, string output_hu
         } 
     }
     cv::destroyAllWindows();
-
-    std::vector<string> human_header{"frame_num", "area_ratio"};
+    
+    std::vector<string> human_header{"frame_num", "human_ratio"};
     write_csv(human_vec, frame_vec, human_header, output_human_path);
     cout << "Done: save human area data." << endl;
 
