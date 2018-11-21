@@ -19,7 +19,7 @@ def diver_dataset(args):
         whether the diver in tank the that day
     diver_cur:
         wheter the diver in tank the current time
-    diver_day and diver cur columns has 1 or 0 value. that mean below.
+    diver_day and diver_cur columns has 1 or 0 value. that mean below.
         1: diver in tank  
         0: diver NOT in tank
     """
@@ -69,7 +69,7 @@ def diver_parse():
     )
 
     # Data Argument
-    parser.add_argument("--date", type=str, default="20181031")
+    parser.add_argument("--date", type=str, default="20170416")
     parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics")
     parser.add_argument("--root_diver_dirc", type=str,
