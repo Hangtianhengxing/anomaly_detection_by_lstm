@@ -20,7 +20,9 @@ def load_degree(file_path, round_deg, deg_width):
     time_degree_lst = []
     degree_dictlst = {"frame_num":[], "right":[], "left":[], "up":[], "down":[], \
                             "right_down":[], "left_down":[], "left_up":[], "right_up":[], \
-                            "overall_dir":[], "degree_mean":[], "degree_std":[]}
+                            "overall_dir":[], "degree_mean":[], "degree_std":[],\
+                            "horizontal":[], "vertical":[], "oblique":[]}
+
     with open(file_path, "r") as f:
         reader = csv.reader(f)
         header = next(reader)
@@ -39,6 +41,11 @@ def load_degree(file_path, round_deg, deg_width):
             dirc2ratio = direction_ratio(time_degree_lst, args.deg_width)
             for k, v in dirc2ratio.items():
                 degree_dictlst[k].append(v)
+
+    # information of rough direction
+    degree_dictlst["horizontal"] = np.array(degree_dictlst["right"]) + np.array(degree_dictlst["left"])
+    degree_dictlst["vertical"] = np.array(degree_dictlst["up"]) + np.array(degree_dictlst["down"])
+    degree_dictlst["oblique"] = np.ones(len(degree_dictlst["horizontal"])) - (np.array(degree_dictlst["horizontal"]) + np.array(degree_dictlst["vertical"]))
 
     return pd.DataFrame(degree_dictlst)
 
