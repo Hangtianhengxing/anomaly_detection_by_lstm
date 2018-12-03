@@ -6,6 +6,7 @@ import logging
 import numpy as np
 import pandas as pd
 import argparse
+import gc
 
 from tqdm import tqdm
 
@@ -50,6 +51,13 @@ def leveled_labels(label_df):
     return label_arr
 
 
+def prev_acc(df, width=60*5):
+    acc_df = pd.Series([0 for _ in range(len(df))])
+    for i in range(width, len(df)):
+        acc_df[i] = np.sum(df.iloc[i-width:i-1]["label"] == 5)
+    return acc_df
+
+
 def one_hot_encoding(label_arr, class_size=5):
     return np.eye(class_size)[label_arr]
 
@@ -59,10 +67,10 @@ def make_datasets(args):
     times_lst = os.listdir("{0}/{1}/".format(args.root_stats_dirc, args.date))
     times_lst = [time for time in times_lst if os.path.isdir("{0}/{1}/{2}/".format(args.root_stats_dirc, args.date, time))]
 
+    dataset_df = pd.DataFrame()
     day_lst = ["Sun", "Mon", "Tue", "Wed", "Thurs", "Fri", "Sat"]
-    time_lst = [str(i) for i in range(9, 17)]
 
-    for time_idx in tqdm(times_lst):
+    for time_idx in tqdm(range(9, 17)):
         mean_df = pd.read_csv("{0}/{1}/{2}/mean.csv".format(
             args.root_stats_dirc, args.date, time_idx))
         var_df = pd.read_csv("{0}/{1}/{2}/var.csv".format(
@@ -105,10 +113,8 @@ def make_datasets(args):
             start_idx = end_idx - args.pred_time if end_idx > args.pred_time else 0
             time_series_df.loc[start_idx:end_idx, "label"] = 1
 
-
-
         # time information
-        for cur_time in time_lst:
+        for cur_time in times_lst:
             if cur_time == time_idx:
                 time_series_df["hour_{0}".format(cur_time)] = 1
             else:
@@ -151,20 +157,35 @@ def make_datasets(args):
             time_series_df["{0}_shift1".format(shift_col)] = time_series_df[shift_col] - time_series_df[shift_col].shift()
         time_series_df = time_series_df.dropna()
 
-        # normalize dataset
-        if args.normalize:
-            col_lst = ["mean", "var", "max", "degree_mean","degree_std"]
-            time_series_df = normalize(time_series_df, col_lst)
+        # check NaN count
+        assert time_series_df.isnull().values.sum() == 0
+        
+        # concat timeseries data
+        dataset_df = pd.concat([dataset_df, time_series_df]).reset_index(drop=True)
+        del time_series_df
+        gc.collect()
 
-        # save dataset
-        if args.normalize:
-            save_path = "{0}/{1}/normalize/time_series_{2}.csv".format(
-                args.save_datasets_dirc, args.date, time_idx)
-        else:
-            save_path = "{0}/{1}/default/time_series_{2}.csv".format(
-                args.save_datasets_dirc, args.date, time_idx)
-        time_series_df.to_csv(save_path, index=False)
-        logger.debug("save dataset: {0}".format(save_path))
+    # normalize dataset
+    if args.normalize:
+        col_lst = ["mean", "var", "max", "degree_mean","degree_std"]
+        dataset_df = normalize(dataset_df, col_lst)
+
+    # count previous acceralation
+    dataset_df["prev_acc_cnt"] = prev_acc(dataset_df, width=60*5)
+
+    # check NaN count
+    dataset_df = dataset_df.fillna(0)
+    assert dataset_df.isnull().values.sum() == 0
+
+    # save dataset
+    if args.normalize:
+        save_path = "{0}/normalize/{1}.csv".format(
+            args.save_datasets_dirc, args.date)
+    else:
+        save_path = "{0}/default/{1}.csv".format(
+            args.save_datasets_dirc, args.date)
+    dataset_df.to_csv(save_path, index=False)
+    logger.debug("save dataset: {0}".format(save_path))
 
 
 def datasets_parse():
