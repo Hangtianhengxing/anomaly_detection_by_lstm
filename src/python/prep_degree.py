@@ -120,10 +120,10 @@ def prep_degree_parse():
     )
 
     # Data Argument
-    parser.add_argument("--root_degree_dirc", type=str,
-                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/20170416/")
+    parser.add_argument("--root_degree_dirc", type=str
+                        default="/Users/sakka/cnn_anomaly_detection/data/statistics/20181101/")
    
-    # Parameter Argumant
+    # Parameter Argument
     parser.add_argument("--round_deg", type=int, default=0)
     parser.add_argument("--deg_width", type=int, default=5)
 
