@@ -50,6 +50,10 @@ def leveled_labels(label_df):
     return label_arr
 
 
+def one_hot_encoding(label_arr, class_size=5):
+    return np.eye(class_size)[label_arr]
+
+
 def make_datasets(args):
     # get time series directory list under the root directory
     times_lst = os.listdir("{0}/{1}/".format(args.root_stats_dirc, args.date))
@@ -157,7 +161,7 @@ def make_datasets(args):
             save_path = "{0}/{1}/normalize/time_series_{2}.csv".format(
                 args.save_datasets_dirc, args.date, time_idx)
         else:
-            save_path = "{0}/{1}/default/time_series_leveled_{2}.csv".format(
+            save_path = "{0}/{1}/default/time_series_{2}.csv".format(
                 args.save_datasets_dirc, args.date, time_idx)
         time_series_df.to_csv(save_path, index=False)
         logger.debug("save dataset: {0}".format(save_path))
@@ -173,8 +177,8 @@ def datasets_parse():
     )
 
     # Data Argument
-    parser.add_argument("--date", type=str, default="20170416")
-    parser.add_argument("--day", type=str, default="Sun",
+    parser.add_argument("--date", type=str, default="20181102")
+    parser.add_argument("--day", type=str, default="Fri",
                         help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
     parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics")
@@ -193,7 +197,7 @@ def datasets_parse():
     parser.add_argument("--pred_time", type=int, default=0, help="how many frame after anormaly is detected (sec*FPS)")
     parser.add_argument("--interval", type=int, default=30, help="interval of dataset row")
     parser.add_argument("--normalize", type=bool, default=False, help="whether normalize or not for dataset")
-    parser.add_argument("--leveled", type=bool, default=False, help="whether or not to devide answer label into levels ")
+    parser.add_argument("--leveled", type=bool, default=True, help="whether or not to devide answer label into levels ")
     args = parser.parse_args()
 
     return args
