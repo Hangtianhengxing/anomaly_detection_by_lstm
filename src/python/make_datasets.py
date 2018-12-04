@@ -17,16 +17,6 @@ logging.basicConfig(filename=logs_path,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 
-def normalize(df, col_lst):
-    result_df = df.copy()
-    for col in col_lst:
-        max_value = df[col].max()
-        min_value = df[col].min()
-        result_df[col] = (df[col] - min_value) / (max_value - min_value)
-
-    return result_df
-
-
 def leveled_labels(label_df):
     """
     5: acceralation
@@ -49,6 +39,19 @@ def leveled_labels(label_df):
 
     label_arr[flag_idx] = 5
     return label_arr
+
+
+def norm_labels(label_arr, kw=60):
+    time_width = label_arr.shape[0]
+    norm_label_arr = np.zeros(time_width)
+    x = np.linspace(0, time_width - 1, num=time_width)
+
+    for i in np.where(label_arr == 1)[0]:
+        norm = stats.norm.pdf(x, loc=i, scale=kw)
+        norm /= np.max(norm)
+        norm_label_arr += norm
+
+    return norm_label_arr, x
 
 
 def prev_acc(df, width=60*5):
@@ -165,11 +168,6 @@ def make_datasets(args):
         del time_series_df
         gc.collect()
 
-    # normalize dataset
-    if args.normalize:
-        col_lst = ["mean", "var", "max", "degree_mean","degree_std"]
-        dataset_df = normalize(dataset_df, col_lst)
-
     # count previous acceralation
     dataset_df["prev_acc_cnt"] = prev_acc(dataset_df, width=60*5)
 
@@ -178,12 +176,7 @@ def make_datasets(args):
     assert dataset_df.isnull().values.sum() == 0
 
     # save dataset
-    if args.normalize:
-        save_path = "{0}/normalize/{1}.csv".format(
-            args.save_datasets_dirc, args.date)
-    else:
-        save_path = "{0}/default/{1}.csv".format(
-            args.save_datasets_dirc, args.date)
+    save_path = "{0}/default/{1}.csv".format(args.save_datasets_dirc, args.date)
     dataset_df.to_csv(save_path, index=False)
     logger.debug("save dataset: {0}".format(save_path))
 
@@ -198,8 +191,8 @@ def datasets_parse():
     )
 
     # Data Argument
-    parser.add_argument("--date", type=str, default="20181102")
-    parser.add_argument("--day", type=str, default="Fri",
+    parser.add_argument("--date", type=str, default="20181103")
+    parser.add_argument("--day", type=str, default="Sat",
                         help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
     parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics")
