@@ -48,7 +48,6 @@ def norm_labels(label_arr, kw=60):
 
     for i in np.where(label_arr == 1)[0]:
         norm = stats.norm.pdf(x, loc=i, scale=kw)
-        norm /= np.max(norm)
         norm_label_arr += norm
 
     return norm_label_arr
@@ -201,8 +200,8 @@ def datasets_parse():
     )
 
     # Data Argument
-    parser.add_argument("--date", type=str, default="20181028")
-    parser.add_argument("--day", type=str, default="Sun",
+    parser.add_argument("--date", type=str, default="20170422")
+    parser.add_argument("--day", type=str, default="Sat",
                         help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
     parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics")
