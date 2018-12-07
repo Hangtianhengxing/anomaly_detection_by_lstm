@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import argparse
 import gc
-
+from scipy import stats
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ def norm_labels(label_arr, kw=60):
         norm /= np.max(norm)
         norm_label_arr += norm
 
-    return norm_label_arr, x
+    return norm_label_arr
 
 
 def prev_acc(df, width=60*5):
@@ -154,6 +154,10 @@ def make_datasets(args):
             logger.debug("Anormal: {0}".format(
                 len(time_series_df[time_series_df["label"] == 1])))
 
+        # label is normalized by pdf
+        if args.normalize:
+            time_series_df["label"] = norm_labels(np.array(time_series_df["label"]))
+
         # shift feature
         shift_col_lst = ["mean", "var", "max", "degree_mean", "degree_std"]
         for shift_col in shift_col_lst:
@@ -176,7 +180,13 @@ def make_datasets(args):
     assert dataset_df.isnull().values.sum() == 0
 
     # save dataset
-    save_path = "{0}/default/{1}.csv".format(args.save_datasets_dirc, args.date)
+    if args.normalize:
+        save_path = "{0}/gaussian/{1}.csv".format(args.save_datasets_dirc, args.date)
+    elif args.leveld:
+        save_path = "{0}/leveled/{1}.csv".format(args.save_datasets_dirc, args.date)
+    else:
+        save_path = "{0}/default/{1}.csv".format(args.save_datasets_dirc, args.date)
+
     dataset_df.to_csv(save_path, index=False)
     logger.debug("save dataset: {0}".format(save_path))
 
@@ -191,8 +201,8 @@ def datasets_parse():
     )
 
     # Data Argument
-    parser.add_argument("--date", type=str, default="20181103")
-    parser.add_argument("--day", type=str, default="Sat",
+    parser.add_argument("--date", type=str, default="20181028")
+    parser.add_argument("--day", type=str, default="Sun",
                         help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
     parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics")
@@ -210,8 +220,8 @@ def datasets_parse():
     # Parameter Argument
     parser.add_argument("--pred_time", type=int, default=0, help="how many frame after anormaly is detected (sec*FPS)")
     parser.add_argument("--interval", type=int, default=30, help="interval of dataset row")
-    parser.add_argument("--normalize", type=bool, default=False, help="whether normalize or not for dataset")
-    parser.add_argument("--leveled", type=bool, default=True, help="whether or not to devide answer label into levels ")
+    parser.add_argument("--normalize", type=bool, default=True, help="whether normalize or not for dataset")
+    parser.add_argument("--leveled", type=bool, default=False, help="whether or not to devide answer label into levels ")
     args = parser.parse_args()
 
     return args
