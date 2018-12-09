@@ -129,36 +129,36 @@ def make_datasets(args):
             else:
                 time_series_df[cur_day] = 0
 
-        # select row for every interval
+        #select row for every interva:
         time_series_df = time_series_df.iloc[[i for i in range(0, len(time_series_df), args.interval)]]
 
-        # devide into levels
-        if args.leveled:
-            time_series_df["label"] = leveled_labels(time_series_df["label"])
-            logger.debug("label is devided into 5 levels")
-            logger.debug("Level 1: {0}".format(
-                len(time_series_df[time_series_df["label"] == 1])))
-            logger.debug("Level 2: {0}".format(
-                len(time_series_df[time_series_df["label"] == 2])))
-            logger.debug("Level 3: {0}".format(
-                len(time_series_df[time_series_df["label"] == 3])))
-            logger.debug("Level 4: {0}".format(
-                len(time_series_df[time_series_df["label"] == 4])))
-            logger.debug("Level 5: {0}".format(
-                len(time_series_df[time_series_df["label"] == 5])))
-        else:
-            logger.debug("label is not devided into levels.")
-            logger.debug("Normal: {0}".format(
-                len(time_series_df[time_series_df["label"] == 0])))
-            logger.debug("Anormal: {0}".format(
-                len(time_series_df[time_series_df["label"] == 1])))
+        # # devide into levels
+        # if args.leveled:
+        #     time_series_df["label"] = leveled_labels(time_series_df["label"])
+        #     logger.debug("label is devided into 5 levels")
+        #     logger.debug("Level 1: {0}".format(
+        #         len(time_series_df[time_series_df["label"] == 1])))
+        #     logger.debug("Level 2: {0}".format(
+        #         len(time_series_df[time_series_df["label"] == 2])))
+        #     logger.debug("Level 3: {0}".format(
+        #         len(time_series_df[time_series_df["label"] == 3])))
+        #     logger.debug("Level 4: {0}".format(
+        #         len(time_series_df[time_series_df["label"] == 4])))
+        #     logger.debug("Level 5: {0}".format(
+        #         len(time_series_df[time_series_df["label"] == 5])))
+        # else:
+        #     logger.debug("label is not devided into levels.")
+        #     logger.debug("Normal: {0}".format(
+        #         len(time_series_df[time_series_df["label"] == 0])))
+        #     logger.debug("Anormal: {0}".format(
+        #         len(time_series_df[time_series_df["label"] == 1])))
 
-        # count previous acceralation
-        dataset_df["prev_acc_cnt"] = prev_acc(dataset_df, width=60*5, acc_label=1)
+        # # count previous acceralation
+        # dataset_df["prev_acc_cnt"] = prev_acc(dataset_df, width=60*5, acc_label=1)
 
-        # label is normalized by pdf
-        if args.normalize:
-            time_series_df["label"] = norm_labels(np.array(time_series_df["label"]))
+        # # label is normalized by pdf
+        # if args.normalize:
+        #     time_series_df["label"] = norm_labels(np.array(time_series_df["label"]))
 
         # shift feature
         shift_col_lst = ["mean", "var", "max", "degree_mean", "degree_std"]
@@ -173,7 +173,35 @@ def make_datasets(args):
         dataset_df = pd.concat([dataset_df, time_series_df]).reset_index(drop=True)
         del time_series_df
         gc.collect()
-        
+
+    # count previous acceralation
+    dataset_df["prev_acc_cnt"] = prev_acc(dataset_df, width=60 * 5, acc_label=1)
+
+    # devide into levels
+    if args.leveled:
+        dataset_df["label"] = leveled_labels(dataset_df["label"])
+        logger.debug("label is devided into 5 levels")
+        logger.debug("Level 1: {0}".format(
+            len(dataset_df[dataset_df["label"] == 1])))
+        logger.debug("Level 2: {0}".format(
+            len(dataset_df[dataset_df["label"] == 2])))
+        logger.debug("Level 3: {0}".format(
+            len(dataset_df[dataset_df["label"] == 3])))
+        logger.debug("Level 4: {0}".format(
+            len(dataset_df[dataset_df["label"] == 4])))
+        logger.debug("Level 5: {0}".format(
+            len(dataset_df[dataset_df["label"] == 5])))
+    else:
+        logger.debug("label is not devided into levels.")
+        logger.debug("Normal: {0}".format(
+            len(dataset_df[dataset_df["label"] == 0])))
+        logger.debug("Anormal: {0}".format(
+            len(dataset_df[dataset_df["label"] == 1])))
+
+    # label is normalized by pdf
+    if args.normalize:
+        dataset_df["label"] = norm_labels(np.array(dataset_df["label"]))
+
     # check NaN count
     dataset_df = dataset_df.fillna(0)
     assert dataset_df.isnull().values.sum() == 0
@@ -200,8 +228,8 @@ def datasets_parse():
     )
 
     # Data Argument
-    parser.add_argument("--date", type=str, default="20181102")
-    parser.add_argument("--day", type=str, default="Fri",
+    parser.add_argument("--date", type=str, default="20170422")
+    parser.add_argument("--day", type=str, default="Sat",
                         help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
     parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics")
