@@ -98,8 +98,8 @@ def main():
     n_pred = 60*10
     save_model_path = "/home/sakka/cnn_anomaly_detection/data/model/model.pth"
 
-    train_n_batches = int((X_train.shape[0]-time_window)/batch_size)
-    val_n_batches = int((X_val.shape[0]-time_window)/batch_size)
+    train_n_batches = int((X_train.shape[0]-n_pred)/batch_size)
+    val_n_batches = int((X_val.shape[0]-n_pred)/batch_size)
 
     train_loss_lst = []
     val_loss_lst = []
