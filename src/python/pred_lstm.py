@@ -76,7 +76,7 @@ def main():
     num_epochs = 100
     input_dim = 65
     hidden_dim = 1024
-    num_layers = 1
+    num_layers = 2
     dropout = 0.5
     output_dim = 1
     lr = 0.001
@@ -117,7 +117,7 @@ def main():
             loss = criterion(output, y)
             loss.backward()
             optimizer.step()  
-            train_loss += loss.data[0]
+            train_loss += loss.item()
             del X, y, loss
             gc.collect()
         
@@ -132,7 +132,7 @@ def main():
             output = model(X)[:, 0]
             
             loss = criterion(output, y)
-            val_loss += loss.data[0]
+            val_loss += loss.item()
             del X, y, loss
             gc.collect()
             
