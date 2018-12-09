@@ -53,10 +53,10 @@ def norm_labels(label_arr, kw=60):
     return norm_label_arr
 
 
-def prev_acc(df, width=60*5):
+def prev_acc(df, width=60*5, acc_label=1):
     acc_df = pd.Series([0 for _ in range(len(df))])
     for i in range(width, len(df)):
-        acc_df[i] = np.sum(df.iloc[i-width:i-1]["label"] == 5)
+        acc_df[i] = np.sum(df.iloc[i-width:i-1]["label"] == acc_label)
     return acc_df
 
 
@@ -153,6 +153,9 @@ def make_datasets(args):
             logger.debug("Anormal: {0}".format(
                 len(time_series_df[time_series_df["label"] == 1])))
 
+        # count previous acceralation
+        dataset_df["prev_acc_cnt"] = prev_acc(dataset_df, width=60*5, acc_label=1)
+
         # label is normalized by pdf
         if args.normalize:
             time_series_df["label"] = norm_labels(np.array(time_series_df["label"]))
@@ -170,10 +173,7 @@ def make_datasets(args):
         dataset_df = pd.concat([dataset_df, time_series_df]).reset_index(drop=True)
         del time_series_df
         gc.collect()
-
-    # count previous acceralation
-    dataset_df["prev_acc_cnt"] = prev_acc(dataset_df, width=60*5)
-
+        
     # check NaN count
     dataset_df = dataset_df.fillna(0)
     assert dataset_df.isnull().values.sum() == 0
@@ -200,8 +200,8 @@ def datasets_parse():
     )
 
     # Data Argument
-    parser.add_argument("--date", type=str, default="20170422")
-    parser.add_argument("--day", type=str, default="Sat",
+    parser.add_argument("--date", type=str, default="20181102")
+    parser.add_argument("--day", type=str, default="Fri",
                         help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
     parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics")
