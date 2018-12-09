@@ -46,8 +46,6 @@ def batch_data(X, y, idx, batch_size, n_prev=60*10):
     # return y: (batch_size)
     start_idx = idx*batch_size
     end_idx = start_idx + batch_size
-    if end_idx > X.shape[0]-n_prev:
-        end_idx = X.shape[0] - n_prev
     X_lst = []
     y_lst = []
     for i in range(start_idx, end_idx):
@@ -85,7 +83,8 @@ def main():
     print("DEVICE: {}".format(device))
 
     model = Predictor(input_dim, hidden_dim, num_layers, dropout, output_dim)
-    model = nn.DataParallel(model).to(device)
+    #model = nn.DataParallel(model).to(device)
+    model = model.to(device)
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -96,10 +95,11 @@ def main():
     best_epoch = 0
     min_epoch = 5
     stop_count = 3
+    time_window = 60*10
     save_model_path = "/home/sakka/cnn_anomaly_detection/data/model/model.pth"
 
-    train_n_batches = int(X_train.shape[0]/batch_size)
-    val_n_batches = int(X_val.shape[0]/batch_size)
+    train_n_batches = int(X_train.shape[0]-time_window/batch_size)
+    val_n_batches = int(X_val.shape[0]-time_window/batch_size)
 
     train_loss_lst = []
     val_loss_lst = []
@@ -109,7 +109,7 @@ def main():
         model.train()
         for train_idx in tqdm(range(train_n_batches)):
             optimizer.zero_grad()
-            X, y = batch_data(X_train, y_train, train_idx, batch_size, n_prev=60*10)
+            X, y = batch_data(X_train, y_train, train_idx, batch_size, n_prev=time_window)
             X = to_variable(torch.Tensor(X))
             y = to_variable(torch.Tensor(y))
             output = model(X)[:, 0]
