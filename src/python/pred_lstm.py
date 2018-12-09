@@ -95,11 +95,11 @@ def main():
     best_epoch = 0
     min_epoch = 5
     stop_count = 3
-    time_window = 60*10
+    n_pred = 60*10
     save_model_path = "/home/sakka/cnn_anomaly_detection/data/model/model.pth"
 
-    train_n_batches = int(X_train.shape[0]-time_window/batch_size)
-    val_n_batches = int(X_val.shape[0]-time_window/batch_size)
+    train_n_batches = int((X_train.shape[0]-time_window)/batch_size)
+    val_n_batches = int((X_val.shape[0]-time_window)/batch_size)
 
     train_loss_lst = []
     val_loss_lst = []
@@ -109,7 +109,7 @@ def main():
         model.train()
         for train_idx in tqdm(range(train_n_batches)):
             optimizer.zero_grad()
-            X, y = batch_data(X_train, y_train, train_idx, batch_size, n_prev=time_window)
+            X, y = batch_data(X_train, y_train, train_idx, batch_size, n_prev=n_pred)
             X = to_variable(torch.Tensor(X))
             y = to_variable(torch.Tensor(y))
             output = model(X)[:, 0]
