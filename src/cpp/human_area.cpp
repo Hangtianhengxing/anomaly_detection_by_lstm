@@ -78,7 +78,10 @@ void human_area(string input_file_path, string human_mask_path, string output_hu
     // initializetion
     cv::Mat frame, gray_frame;
     cv::Mat bin_human_mask = read_mask(human_mask_path, true);
+    float prev_ratio = 0.0;
     float area_ratio;
+    // ratio_thresh is interpolate outliers.
+    float ratio_thresh = 0.9;
     std::vector<float> human_vec;
     human_vec.reserve(total_frame+10);
     int frame_num = 0;
@@ -103,7 +106,12 @@ void human_area(string input_file_path, string human_mask_path, string output_hu
 
         cv::cvtColor(frame, gray_frame, CV_RGB2GRAY);
         area_ratio = calc_area_ratio(gray_frame, bin_human_mask);
-        human_vec.push_back(area_ratio);
+        if (area_ratio <= ratio_thresh){
+            human_vec.push_back(area_ratio);
+            prev_ratio = area_ratio;
+        }else {
+            human_vec.push_back(prev_ratio);
+        }
 
         // remove company logo
         if (frame_num >= total_frame-3*30){
