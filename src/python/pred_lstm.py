@@ -93,7 +93,7 @@ def main(args):
     logger.debug("y_val shape: {}".format(y_val.shape))
 
     # define model
-      device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.debug("DEVICE: {}".format(device))
 
     model = Predictor(args.input_dim, args.hidden_dim, args.num_layers, args.dropout, args.output_dim)
