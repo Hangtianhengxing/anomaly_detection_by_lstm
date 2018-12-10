@@ -4,12 +4,19 @@
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+import logging
 import gc
 
 import torch
 import torch.nn as nn
 from torch.optim import SGD
 from torch.autograd import Variable
+
+logger = logging.getLogger(__name__)
+logs_path = "/home/sakka/cnn_anomaly_detection/logs/lstm.log"
+logging.basicConfig(filename=logs_path,
+                    level=logging.DEBUG,
+                    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 class Predictor(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, dropout, output_dim):
@@ -60,15 +67,15 @@ def main():
     train_df = pd.read_csv(train_data_path)
     X_train = train_df.as_matrix()
     y_train = train_df["label"].as_matrix()
-    print("X shape: {}".format(X_train.shape))
-    print("y shape: {}".format(y_train.shape))
+    logger.debug("X shape: {}".format(X_train.shape))
+    logger.debug("y shape: {}".format(y_train.shape))
 
     val_data_path = "/home/sakka/cnn_anomaly_detection/data/datasets/gaussian/20170418.csv"
     val_df = pd.read_csv(val_data_path)
     X_val = val_df.as_matrix()
     y_val = val_df["label"].as_matrix()
-    print("X_val shape: {}".format(X_val.shape))
-    print("y_val shape: {}".format(y_val.shape))
+    logger.debug("X_val shape: {}".format(X_val.shape))
+    logger.debug("y_val shape: {}".format(y_val.shape))
 
     # define model
     num_epochs = 100
@@ -80,7 +87,7 @@ def main():
     lr = 0.001
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("DEVICE: {}".format(device))
+    logger.debug("DEVICE: {}".format(device))
 
     model = Predictor(input_dim, hidden_dim, num_layers, dropout, output_dim)
     #model = nn.DataParallel(model).to(device)
@@ -148,7 +155,7 @@ def main():
             best_epoch = epoch+1
             torch.save(model.state_dict(), save_model_path)
 
-        print("EPOCH: {}, TRAIN LOSS: {}, VAL LOSS: {}, EARLY STOPPING: {}/{}".format(
+        logger.debug("EPOCH: {}, TRAIN LOSS: {}, VAL LOSS: {}, EARLY STOPPING: {}/{}".format(
                     epoch + 1, 
                     train_loss_lst[-1], 
                     val_loss_lst[-1],
@@ -156,7 +163,7 @@ def main():
                     stop_count))
 
         if not_improved_count == stop_count:
-            print("Early Stopping")
+            logger.debug("Early Stopping")
             break
 
 if __name__ == "__main__":
