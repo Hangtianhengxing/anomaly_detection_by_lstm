@@ -190,7 +190,7 @@ def make_lstm_parse():
 
     # Parameter Argument
     parser.add_argument("--num_epochs", type=int, default=100)
-    parser.add_argument("--input_dim", type=int, default=67)
+    parser.add_argument("--input_dim", type=int, default=66)
     parser.add_argument("--hidden_dim", type=int, default=512)
     parser.add_argument("--num_layers", type=int, default=2)
     parser.add_argument("--dropout", type=int, default=0.5)
