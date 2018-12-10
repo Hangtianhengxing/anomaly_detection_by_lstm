@@ -69,7 +69,8 @@ def make_datasets(args):
     times_lst = os.listdir("{0}/{1}/".format(args.root_stats_dirc, args.date))
     times_lst = [time for time in times_lst if os.path.isdir("{0}/{1}/{2}/".format(args.root_stats_dirc, args.date, time))]
 
-    dataset_df = pd.DataFrame()
+    col_name_lst = list(pd.read_csv(args.col_name_path)["col_name"])
+    dataset_df = pd.DataFrame(columns=col_name_lst)
     day_lst = ["Sun", "Mon", "Tue", "Wed", "Thurs", "Fri", "Sat"]
 
     for time_idx in tqdm(range(9, 17)):
@@ -131,34 +132,6 @@ def make_datasets(args):
 
         #select row for every interva:
         time_series_df = time_series_df.iloc[[i for i in range(0, len(time_series_df), args.interval)]]
-
-        # # devide into levels
-        # if args.leveled:
-        #     time_series_df["label"] = leveled_labels(time_series_df["label"])
-        #     logger.debug("label is devided into 5 levels")
-        #     logger.debug("Level 1: {0}".format(
-        #         len(time_series_df[time_series_df["label"] == 1])))
-        #     logger.debug("Level 2: {0}".format(
-        #         len(time_series_df[time_series_df["label"] == 2])))
-        #     logger.debug("Level 3: {0}".format(
-        #         len(time_series_df[time_series_df["label"] == 3])))
-        #     logger.debug("Level 4: {0}".format(
-        #         len(time_series_df[time_series_df["label"] == 4])))
-        #     logger.debug("Level 5: {0}".format(
-        #         len(time_series_df[time_series_df["label"] == 5])))
-        # else:
-        #     logger.debug("label is not devided into levels.")
-        #     logger.debug("Normal: {0}".format(
-        #         len(time_series_df[time_series_df["label"] == 0])))
-        #     logger.debug("Anormal: {0}".format(
-        #         len(time_series_df[time_series_df["label"] == 1])))
-
-        # # count previous acceralation
-        # dataset_df["prev_acc_cnt"] = prev_acc(dataset_df, width=60*5, acc_label=1)
-
-        # # label is normalized by pdf
-        # if args.normalize:
-        #     time_series_df["label"] = norm_labels(np.array(time_series_df["label"]))
 
         # shift feature
         shift_col_lst = ["mean", "var", "max", "degree_mean", "degree_std"]
@@ -231,6 +204,8 @@ def datasets_parse():
     parser.add_argument("--date", type=str, default="20170422")
     parser.add_argument("--day", type=str, default="Sat",
                         help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
+    parser.add_argument("--col_name_path", type=str, 
+                        default="/Users/sakka/cnn_anomaly_detection/data/datasets/datasets_col.csv")
     parser.add_argument("--root_stats_dirc", type=str,
                         default="/Users/sakka/cnn_anomaly_detection/data/statistics")
     parser.add_argument("--root_grid_dirc", type=str,
