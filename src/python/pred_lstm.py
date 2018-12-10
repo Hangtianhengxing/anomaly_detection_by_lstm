@@ -6,7 +6,7 @@ import pandas as pd
 from tqdm import tqdm
 import logging
 import gc
-
+from sklearn.preprocessing import MinMaxScaler
 import torch
 import torch.nn as nn
 from torch.optim import SGD
@@ -48,6 +48,20 @@ def to_variable(x):
     return Variable(x)
 
 
+def scale(X_train, X_val, y_train, y_val):
+    # scale inputs
+    X_sclr = MinMaxScaler()
+    X_train = X_sclr.fit_transform(X_train)
+    X_val = X_sclr.transform(X_val)
+
+    # scale labels
+    y_sclr = MinMaxScaler()
+    y_train = y_sclr.fit_transform(y_train.reshape(-1, 1))
+    y_val = y_sclr.transform(y_val.reshape(-1, 1))
+
+    return X_train, X_val, y_train, y_val
+
+
 def batch_data(X, y, idx, batch_size, n_prev=60*10):
     # return X: (batch_size, time_window, feature_dim)
     # return y: (batch_size)
@@ -66,12 +80,15 @@ def main(args):
     train_df = pd.read_csv(args.train_path)
     X_train = train_df.as_matrix()
     y_train = train_df["label"].as_matrix()
-    logger.debug("X shape: {}".format(X_train.shape))
-    logger.debug("y shape: {}".format(y_train.shape))
 
     val_df = pd.read_csv(args.val_path)
     X_val = val_df.as_matrix()
     y_val = val_df["label"].as_matrix()
+
+    # train and val data applied MinMaxScaler 
+    X_train, X_val, y_train, y_val = scale(X_train, X_val, y_train, y_val)
+    logger.debug("X_train shape: {}".format(X_train.shape))
+    logger.debug("y_train shape: {}".format(y_train.shape))
     logger.debug("X_val shape: {}".format(X_val.shape))
     logger.debug("y_val shape: {}".format(y_val.shape))
 
@@ -186,6 +203,7 @@ def make_lstm_parse():
     args = parser.parser_args()
 
     return args
+
 
 if __name__ == "__main__":
     args = make_lstm_parse()
