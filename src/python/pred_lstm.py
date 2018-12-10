@@ -57,8 +57,8 @@ def scale(X_train, X_val, y_train, y_val):
 
     # scale labels
     y_sclr = MinMaxScaler()
-    y_train = y_sclr.fit_transform(y_train.reshape(-1, 1))
-    y_val = y_sclr.transform(y_val.reshape(-1, 1))
+    y_train = y_sclr.fit_transform(y_train.reshape(-1, 1)).reshape(-1)
+    y_val = y_sclr.transform(y_val.reshape(-1, 1)).reshape(-1)
 
     return X_train, X_val, y_train, y_val
 
