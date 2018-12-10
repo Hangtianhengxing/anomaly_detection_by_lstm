@@ -135,7 +135,7 @@ def main(args):
             
         model.eval()
         for val_idx in tqdm(range(val_n_batches)):
-            X, y = batch_data(X_val, y_val, val_idx, aargs.batch_size)
+            X, y = batch_data(X_val, y_val, val_idx, args.batch_size)
             X = to_variable(torch.Tensor(X))
             y = to_variable(torch.Tensor(y))
                 
