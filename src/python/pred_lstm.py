@@ -50,7 +50,7 @@ class Predictor(nn.Module):
         if fc_dropout is not None:
             output = fc_out(fc_dropout(output[:, -1, :]))
         else:
-            output = fc_out(output[:,  -1, :]
+            output = fc_out(output[:,  -1, :])
         
         return output
 
