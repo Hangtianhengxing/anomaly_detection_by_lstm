@@ -20,25 +20,37 @@ logging.basicConfig(filename=logs_path,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
 class Predictor(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, dropout, output_dim):
+    def __init__(self, input_dim, hidden_dim, num_layers, output_dim, dropout_ratio=0.5):
         super(Predictor, self).__init__()
         
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
-        self.dropout = dropout
+        self.dropout_ratio = dropout_ratio
         self.output_dim = output_dim
         
         self.lstm = nn.LSTM(input_size=input_dim,
                            hidden_size=hidden_dim,
                            num_layers = num_layers,
-                           dropout=dropout,
                            batch_first=True)
+
+        if dropout_ratio < 1:
+            self.fc_dropout = nn.Dropout(dropout_ratio)
+        else:
+            self.fc_dropout = None
+
         self.fc_out = nn.Linear(hidden_dim, output_dim)
         
     def forward(self, input_feature, h0=None):
-        output, (h_n, c_n) = self.lstm(input_feature, h0)
-        output = self.fc_out(output[:,  -1, :])
+        lstm = self.lstm
+        fc_dropout = self.fc_dropout
+        fc_out = self.fc_out
+
+        output, (h_n, c_n) = lstm(input_feature, h0)
+        if fc_dropout is not None:
+            output = fc_out(fc_dropout(output[:, -1, :]))
+        else:
+            output = fc_out(output[:,  -1, :]
         
         return output
 
@@ -97,7 +109,7 @@ def main(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.debug("DEVICE: {}".format(device))
 
-    model = Predictor(args.input_dim, args.hidden_dim, args.num_layers, args.dropout, args.output_dim)
+    model = Predictor(args.input_dim, args.hidden_dim, args.num_layers, args.output_dim, args.dropout_ratio)
     model = nn.DataParallel(model).to(device)
     #model = model.to(device)
 
@@ -193,7 +205,7 @@ def make_lstm_parse():
     parser.add_argument("--input_dim", type=int, default=66)
     parser.add_argument("--hidden_dim", type=int, default=512)
     parser.add_argument("--num_layers", type=int, default=2)
-    parser.add_argument("--dropout", type=int, default=0.5)
+    parser.add_argument("--dropout_ratio", type=int, default=0.5)
     parser.add_argument("--output_dim", type=float, default=1)
     parser.add_argument("--lr", type=float, default=0.0001)
     parser.add_argument("--batch_size", type=int, default=128)
