@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import logging
+import argparse
 import gc
 from sklearn.preprocessing import MinMaxScaler
 import torch
@@ -170,7 +171,7 @@ def main(args):
 
 
 def make_lstm_parse():
-    parser = argparser.ArgumentParser(
+    parser = argparse.ArgumentParser(
         prog="pred_lstm.py",
         usage="train lstm",
         description="description",
