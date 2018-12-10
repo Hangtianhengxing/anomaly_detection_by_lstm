@@ -201,7 +201,7 @@ def make_lstm_parse():
     parser.add_argument("--stop_count", type=int, default=3)
     parser.add_argument("--n_pred", type=int, default=60*10)
 
-    args = parser.parser_args()
+    args = parser.parse_args()
 
     return args
 
