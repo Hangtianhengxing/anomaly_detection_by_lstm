@@ -79,12 +79,12 @@ def batch_data(X, y, idx, batch_size, n_prev=60*10):
 def main(args):
     # load dataset
     train_df = pd.read_csv(args.train_path)
-    X_train = train_df.as_matrix()
     y_train = train_df["label"].as_matrix()
+    X_train = train_df.drop("label", axis=1).as_matrix()
 
     val_df = pd.read_csv(args.val_path)
-    X_val = val_df.as_matrix()
     y_val = val_df["label"].as_matrix()
+    X_val = val_df.drop("label", axis=1).as_matrix()
 
     # train and val data applied MinMaxScaler 
     X_train, X_val, y_train, y_val = scale(X_train, X_val, y_train, y_val)
@@ -98,8 +98,8 @@ def main(args):
     logger.debug("DEVICE: {}".format(device))
 
     model = Predictor(args.input_dim, args.hidden_dim, args.num_layers, args.dropout, args.output_dim)
-    #model = nn.DataParallel(model).to(device)
-    model = model.to(device)
+    model = nn.DataParallel(model).to(device)
+    #model = model.to(device)
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
@@ -191,15 +191,15 @@ def make_lstm_parse():
     # Parameter Argument
     parser.add_argument("--num_epochs", type=int, default=100)
     parser.add_argument("--input_dim", type=int, default=67)
-    parser.add_argument("--hidden_dim", type=int, default=1024)
+    parser.add_argument("--hidden_dim", type=int, default=512)
     parser.add_argument("--num_layers", type=int, default=2)
     parser.add_argument("--dropout", type=int, default=0.5)
     parser.add_argument("--output_dim", type=float, default=1)
     parser.add_argument("--lr", type=float, default=0.0001)
-    parser.add_argument("--batch_size", type=int, default=32)
+    parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--min_epoch", type=int, default=5)
     parser.add_argument("--stop_count", type=int, default=3)
-    parser.add_argument("--n_pred", type=int, default=60*10)
+    parser.add_argument("--n_pred", type=int, default=60*30)
 
     args = parser.parse_args()
 
