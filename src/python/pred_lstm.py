@@ -61,62 +61,47 @@ def batch_data(X, y, idx, batch_size, n_prev=60*10):
     return X_lst, y_lst
 
 
-def main():
+def main(args):
     # load dataset
-    train_data_path = "/home/sakka/cnn_anomaly_detection/data/datasets/gaussian/20170416.csv"
-    train_df = pd.read_csv(train_data_path)
+    train_df = pd.read_csv(args.train_path)
     X_train = train_df.as_matrix()
     y_train = train_df["label"].as_matrix()
     logger.debug("X shape: {}".format(X_train.shape))
     logger.debug("y shape: {}".format(y_train.shape))
 
-    val_data_path = "/home/sakka/cnn_anomaly_detection/data/datasets/gaussian/20170418.csv"
-    val_df = pd.read_csv(val_data_path)
+    val_df = pd.read_csv(args.val_path)
     X_val = val_df.as_matrix()
     y_val = val_df["label"].as_matrix()
     logger.debug("X_val shape: {}".format(X_val.shape))
     logger.debug("y_val shape: {}".format(y_val.shape))
 
     # define model
-    num_epochs = 100
-    input_dim = 65
-    hidden_dim = 1024
-    num_layers = 2
-    dropout = 0.5
-    output_dim = 1
-    lr = 0.001
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+      device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.debug("DEVICE: {}".format(device))
 
-    model = Predictor(input_dim, hidden_dim, num_layers, dropout, output_dim)
+    model = Predictor(args.input_dim, args.hidden_dim, args.num_layers, args.dropout, args.output_dim)
     #model = nn.DataParallel(model).to(device)
     model = model.to(device)
 
     criterion = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
 
-    batch_size = 32
     not_improved_count = 0
     best_epoch = 0
-    min_epoch = 5
-    stop_count = 3
-    n_pred = 60*10
-    save_model_path = "/home/sakka/cnn_anomaly_detection/data/model/model.pth"
 
-    train_n_batches = int((X_train.shape[0]-n_pred)/batch_size)
-    val_n_batches = int((X_val.shape[0]-n_pred)/batch_size)
+    train_n_batches = int((X_train.shape[0]-args.n_pred)/args.batch_size)
+    val_n_batches = int((X_val.shape[0]-args.n_pred)/args.batch_size)
 
     train_loss_lst = []
     val_loss_lst = []
-    for epoch in range(num_epochs):
+    for epoch in range(args.num_epochs):
         train_loss = 0.0
         val_loss = 0.0
         model.train()
         for train_idx in tqdm(range(train_n_batches)):
             optimizer.zero_grad()
-            X, y = batch_data(X_train, y_train, train_idx, batch_size, n_prev=n_pred)
+            X, y = batch_data(X_train, y_train, train_idx, args.batch_size, n_prev=args.n_pred)
             X = to_variable(torch.Tensor(X))
             y = to_variable(torch.Tensor(y))
             output = model(X)[:, 0]
@@ -132,7 +117,7 @@ def main():
             
         model.eval()
         for val_idx in tqdm(range(val_n_batches)):
-            X, y = batch_data(X_val, y_val, val_idx, batch_size)
+            X, y = batch_data(X_val, y_val, val_idx, aargs.batch_size)
             X = to_variable(torch.Tensor(X))
             y = to_variable(torch.Tensor(y))
                 
@@ -146,25 +131,63 @@ def main():
         val_loss_lst.append(val_loss)
         
         # early stopping
-        if (epoch > min_epoch) and (val_loss_lst[-1] > val_loss_lst[-2]):
+        if (epoch > args.min_epoch) and (val_loss_lst[-1] > val_loss_lst[-2]):
             not_improved_count += 1
         else:
             # learning is going well
             not_improved_count = 0
             # save best params model
             best_epoch = epoch+1
-            torch.save(model.state_dict(), save_model_path)
+            torch.save(model.state_dict(), args.save_model_path)
 
         logger.debug("EPOCH: {}, TRAIN LOSS: {}, VAL LOSS: {}, EARLY STOPPING: {}/{}".format(
                     epoch + 1, 
                     train_loss_lst[-1], 
                     val_loss_lst[-1],
                     not_improved_count,
-                    stop_count))
+                    args.stop_count))
 
-        if not_improved_count == stop_count:
+        if not_improved_count == args.stop_count:
             logger.debug("Early Stopping")
             break
 
+
+def make_lstm_parse():
+    parser = argparser.ArgumentParser(
+        prog="pred_lstm.py",
+        usage="train lstm",
+        description="description",
+        epilog="end",
+        add_help=True
+    )
+
+    # Data Argument
+    parser.add_argument("--train_path", type=str,
+                        default="/home/sakka/cnn_anomaly_detection/data/datasets/gaussian/train.csv")
+    parser.add_argument("--val_path", type=str,
+                        default="/home/sakka/cnn_anomaly_detection/data/datasets/gaussian/val.csv")
+    parser.add_argument("--save_model_path", type=str,
+                        default="/home/sakka/cnn_anomaly_detection/data/model/model.pth")
+
+
+    # Parameter Argument
+    parser.add_argument("--num_epochs", type=int, default=100)
+    parser.add_argument("--input_dim", type=int, default=67)
+    parser.add_argument("--hidden_dim", type=int, default=1024)
+    parser.add_argument("--num_layers", type=int, default=100)
+    parser.add_argument("--dropout", type=int, default=2)
+    parser.add_argument("--output_dim", type=float, default=0.5)
+    parser.add_argument("--lr", type=float, default=0.001)
+    parser.add_argument("--batch_size", type=int, default=32)
+    parser.add_argument("--min_epoch", type=int, default=5)
+    parser.add_argument("--stop_count", type=int, default=3)
+    parser.add_argument("--n_pred", type=int, default=60*10)
+
+    args = parser.parser_args()
+
+    return args
+
 if __name__ == "__main__":
-    main()
+    args = make_lstm_parse()
+    logger.debug("Running with args: {0}".format(args))
+    main(args)
