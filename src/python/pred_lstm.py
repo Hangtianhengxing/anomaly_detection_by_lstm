@@ -99,11 +99,13 @@ def main(args):
     # load dataset
     train_df = pd.read_csv(args.train_path)
     y_train = train_df["label"].as_matrix()
-    X_train = train_df.drop("label", axis=1).as_matrix()
+    #X_train = train_df.drop("label", axis=1).as_matrix()
+    X_train = train_df.as_matrix()
 
     val_df = pd.read_csv(args.val_path)
     y_val = val_df["label"].as_matrix()
-    X_val = val_df.drop("label", axis=1).as_matrix()
+    #X_val = val_df.drop("label", axis=1).as_matrix()
+    X_val = val_df.as_matrix()
 
     # train and val data applied MinMaxScaler 
     X_train, X_val, y_train, y_val = scale(X_train, X_val, y_train, y_val)
@@ -117,8 +119,8 @@ def main(args):
     logger.debug("DEVICE: {}".format(device))
 
     model = Predictor(args.input_dim, args.hidden_dim, args.num_layers, args.output_dim, args.dropout_ratio)
-    model = nn.DataParallel(model).to(device)
-    #model = model.to(device)
+    #model = nn.DataParallel(model).to(device)
+    model = model.to(device)
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
