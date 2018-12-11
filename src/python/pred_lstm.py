@@ -90,12 +90,6 @@ def batch_data(X, y, idx, batch_size, n_prev=60*10):
 
 
 def main(args):
-    # starting info
-    date = datetime.now()
-    learning_date = "{0}_{1}_{2}_{3}_{4}".format(
-        date.year, date.month, date.day, date.hour, date.minute)
-    save_model_path = "{0}/model_{1}.pth".format(args.save_model_dirc, learning_date)
-
     # load dataset
     train_df = pd.read_csv(args.train_path)
     y_train = train_df["label"].as_matrix()
@@ -117,20 +111,27 @@ def main(args):
     # define model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.debug("DEVICE: {}".format(device))
-
     model = Predictor(args.input_dim, args.hidden_dim, args.num_layers, args.output_dim, args.dropout_ratio)
     #model = nn.DataParallel(model).to(device)
     model = model.to(device)
 
+    # learning condition
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-
 
     not_improved_count = 0
     best_epoch = 0
 
+    # number of each batch
     train_n_batches = int((X_train.shape[0]-args.n_pred)/args.batch_size)
     val_n_batches = int((X_val.shape[0]-args.n_pred)/args.batch_size)
+
+    # starting info
+    date = datetime.now()
+    learning_date = "{0}_{1}_{2}_{3}_{4}".format(
+        date.year, date.month, date.day, date.hour, date.minute)
+    save_model_path = "{0}/model_{1}.pth".format(
+        args.save_model_dirc, learning_date)
 
     train_loss_lst = []
     val_loss_lst = []
