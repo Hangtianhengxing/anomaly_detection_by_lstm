@@ -7,6 +7,7 @@ from tqdm import tqdm
 import logging
 import argparse
 import gc
+from datetime import datetime
 from sklearn.preprocessing import MinMaxScaler
 import torch
 import torch.nn as nn
@@ -89,6 +90,12 @@ def batch_data(X, y, idx, batch_size, n_prev=60*10):
 
 
 def main(args):
+    # starting info
+    date = datetime.now()
+    learning_date = "{0}_{1}_{2}_{3}_{4}".format(
+        date.year, date.month, date.day, date.hour, date.minute)
+    save_model_path = "{0}/model_{1}.pth".format(args.save_model_dirc, learning_date)
+
     # load dataset
     train_df = pd.read_csv(args.train_path)
     y_train = train_df["label"].as_matrix()
@@ -168,7 +175,7 @@ def main(args):
             not_improved_count = 0
             # save best params model
             best_epoch = epoch+1
-            torch.save(model.state_dict(), args.save_model_path)
+            torch.save(model.state_dict(), save_model_path)
 
         logger.debug("EPOCH: {}, TRAIN LOSS: {}, VAL LOSS: {}, EARLY STOPPING: {}/{}".format(
                     epoch + 1, 
@@ -180,6 +187,8 @@ def main(args):
         if not_improved_count == args.stop_count:
             logger.debug("Early Stopping")
             break
+
+    logger.debug("Model saved in \"{0}\"".format(save_model_path))
 
 
 def make_lstm_parse():
@@ -196,15 +205,15 @@ def make_lstm_parse():
                         default="/home/sakka/cnn_anomaly_detection/data/datasets/gaussian/train.csv")
     parser.add_argument("--val_path", type=str,
                         default="/home/sakka/cnn_anomaly_detection/data/datasets/gaussian/val.csv")
-    parser.add_argument("--save_model_path", type=str,
-                        default="/home/sakka/cnn_anomaly_detection/data/model/model.pth")
+    parser.add_argument("--save_model_dirc", type=str,
+                        default="/home/sakka/cnn_anomaly_detection/data/model")
 
 
     # Parameter Argument
     parser.add_argument("--num_epochs", type=int, default=100)
-    parser.add_argument("--input_dim", type=int, default=66)
-    parser.add_argument("--hidden_dim", type=int, default=512)
-    parser.add_argument("--num_layers", type=int, default=2)
+    parser.add_argument("--input_dim", type=int, default=67)
+    parser.add_argument("--hidden_dim", type=int, default=64)
+    parser.add_argument("--num_layers", type=int, default=1)
     parser.add_argument("--dropout_ratio", type=int, default=0.5)
     parser.add_argument("--output_dim", type=float, default=1)
     parser.add_argument("--lr", type=float, default=0.0001)
