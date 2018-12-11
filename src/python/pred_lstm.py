@@ -76,7 +76,7 @@ def scale(X_train, X_val, y_train, y_val):
     return X_train, X_val, y_train, y_val
 
 
-def batch_data(X, y, idx, batch_size, n_prev=60*10):
+def batch_data(X, y, idx, batch_size, n_prev=60*10, pred_point=60*10):
     # return X: (batch_size, time_window, feature_dim)
     # return y: (batch_size)
     start_idx = idx*batch_size
@@ -85,7 +85,8 @@ def batch_data(X, y, idx, batch_size, n_prev=60*10):
     y_lst = []
     for i in range(start_idx, end_idx):
         X_lst.append(X[i:i+n_prev])
-        y_lst.append(y[i+n_prev])
+        # label of ahead pred_point
+        y_lst.append(y[i+n_prev+pred_point-1])
     return X_lst, y_lst
 
 
@@ -123,8 +124,8 @@ def main(args):
     best_epoch = 0
 
     # number of each batch
-    train_n_batches = int((X_train.shape[0]-args.n_pred)/args.batch_size)
-    val_n_batches = int((X_val.shape[0]-args.n_pred)/args.batch_size)
+    train_n_batches = int((X_train.shape[0]-args.n_pred-args.pred_point+1)/args.batch_size)
+    val_n_batches = int((X_val.shape[0]-args.n_pred-args.pred_point+1)/args.batch_size)
 
     # starting info
     date = datetime.now()
@@ -141,7 +142,7 @@ def main(args):
         model.train()
         for train_idx in tqdm(range(train_n_batches)):
             optimizer.zero_grad()
-            X, y = batch_data(X_train, y_train, train_idx, args.batch_size, n_prev=args.n_pred)
+            X, y = batch_data(X_train, y_train, train_idx, args.batch_size, n_prev=args.n_pred, pred_point=args.pred_point)
             X = to_variable(torch.Tensor(X))
             y = to_variable(torch.Tensor(y))
             output = model(X)[:, 0]
@@ -157,7 +158,7 @@ def main(args):
             
         model.eval()
         for val_idx in tqdm(range(val_n_batches)):
-            X, y = batch_data(X_val, y_val, val_idx, args.batch_size)
+            X, y = batch_data(X_val, y_val, val_idx, args.batch_size, n_prev=args.n_pred, pred_point=args.pred_point)
             X = to_variable(torch.Tensor(X))
             y = to_variable(torch.Tensor(y))
                 
@@ -224,6 +225,7 @@ def make_lstm_parse():
     parser.add_argument("--min_epoch", type=int, default=5)
     parser.add_argument("--stop_count", type=int, default=3)
     parser.add_argument("--n_pred", type=int, default=60*30)
+    parser.add_argument("--pred_point", type=int, default=60*10)
 
     args = parser.parse_args()
 
