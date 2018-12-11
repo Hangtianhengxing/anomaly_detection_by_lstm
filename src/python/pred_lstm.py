@@ -128,7 +128,7 @@ def main(args):
 
     # starting info
     date = datetime.now()
-    learning_date = "{0}_{1}_{2}_{3}_{4}".format(
+    learning_date = "{0}{1}{2}_{3}{4}".format(
         date.year, date.month, date.day, date.hour, date.minute)
     save_model_path = "{0}/model_{1}.pth".format(
         args.save_model_dirc, learning_date)
