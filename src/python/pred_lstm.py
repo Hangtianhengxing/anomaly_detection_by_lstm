@@ -14,6 +14,11 @@ import torch.nn as nn
 from torch.optim import SGD
 from torch.autograd import Variable
 
+
+date = datetime.now()
+learning_date = "{0}{1}{2}_{3}{4}".format(
+    date.year, date.month, date.day, date.hour, date.minute)
+
 logger = logging.getLogger(__name__)
 logs_path = "/home/sakka/cnn_anomaly_detection/logs/lstm.log"
 logging.basicConfig(filename=logs_path,
@@ -128,9 +133,6 @@ def main(args):
     val_n_batches = int((X_val.shape[0]-args.n_pred-args.pred_point+1)/args.batch_size)
 
     # starting info
-    date = datetime.now()
-    learning_date = "{0}{1}{2}_{3}{4}".format(
-        date.year, date.month, date.day, date.hour, date.minute)
     save_model_path = "{0}/model_{1}.pth".format(
         args.save_model_dirc, learning_date)
 
