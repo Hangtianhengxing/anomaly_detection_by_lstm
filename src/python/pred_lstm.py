@@ -206,9 +206,9 @@ def make_lstm_parse():
 
     # Data Argument
     parser.add_argument("--train_path", type=str,
-                        default="/home/sakka/cnn_anomaly_detection/data/datasets/gaussian/train.csv")
+                        default="/home/sakka/cnn_anomaly_detection/data/datasets/train_gaus.csv")
     parser.add_argument("--val_path", type=str,
-                        default="/home/sakka/cnn_anomaly_detection/data/datasets/gaussian/val.csv")
+                        default="/home/sakka/cnn_anomaly_detection/data/datasets/val_gaus.csv")
     parser.add_argument("--save_model_dirc", type=str,
                         default="/home/sakka/cnn_anomaly_detection/data/model")
 
@@ -220,8 +220,8 @@ def make_lstm_parse():
     parser.add_argument("--num_layers", type=int, default=1)
     parser.add_argument("--dropout_ratio", type=int, default=0.5)
     parser.add_argument("--output_dim", type=float, default=1)
-    parser.add_argument("--lr", type=float, default=0.0001)
-    parser.add_argument("--batch_size", type=int, default=128)
+    parser.add_argument("--lr", type=float, default=0.00001)
+    parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--min_epoch", type=int, default=5)
     parser.add_argument("--stop_count", type=int, default=3)
     parser.add_argument("--n_pred", type=int, default=60*30)
