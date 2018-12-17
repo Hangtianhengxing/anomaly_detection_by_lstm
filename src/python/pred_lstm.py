@@ -20,7 +20,7 @@ learning_date = "{0}{1}{2}_{3}{4}".format(
     date.year, date.month, date.day, date.hour, date.minute)
 
 logger = logging.getLogger(__name__)
-logs_path = "/home/sakka/cnn_anomaly_detection/logs/lstm.log"
+logs_path = "/home/sakka/cnn_anomaly_detection/logs/lstm_{}.log".format(learning_date)
 logging.basicConfig(filename=logs_path,
                     level=logging.DEBUG,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
