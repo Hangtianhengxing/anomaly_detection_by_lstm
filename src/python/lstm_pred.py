@@ -16,7 +16,7 @@ from torch.optim import SGD
 from torch.autograd import Variable
 from sklearn.preprocessing import MinMaxScaler
 
-from lstm_util import Predictor, scale, 
+from lstm_util import Predictor, to_variable, scale, pred_batch_data, plot_pred, plot_corr
 
 date = datetime.now()
 learning_date = "{0}{1}{2}_{3}{4}".format(
@@ -79,7 +79,7 @@ def predict(args):
         corr_save_path = "{0}/corr_{1}.png".format(args.save_putput_dirc, learning_date)
         plot_corr(np.array(pred_lst), y_test, args.n_prev, args.pred_point, corr_save_path)
         logger.debug("Save Corr in {0}".format(corr_save_path))
-        
+
 
 def make_pred_parse():
     parser = argparse.ArgumentParser(

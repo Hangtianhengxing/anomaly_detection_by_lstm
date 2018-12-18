@@ -110,7 +110,7 @@ def plot_pred(pred_arr, answer_arr, n_prev, pred_point, save_path):
         ["9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"])
 
     # graph setting
-    plt.xlim(0, len(pred_arr)
+    plt.xlim(0, len(pred_arr))
     plt.ylim(0.0, 1.0)
     plt.grid()
     plt.title("Predcition of anomaly level by using LSTM")
