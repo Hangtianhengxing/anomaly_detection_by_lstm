@@ -115,6 +115,6 @@ def make_pred_parse():
     return args
 
 if __name__ == "__main__":
-    args = make_lstm_parse()
+    args = make_pred_parse()
     logger.debug("Running with args: {0}".format(args))
     predict(args)
