@@ -70,7 +70,7 @@ def predict(args):
         y_pred = model(X)[:, 0]
         y_pred = y_pred.cpu().data.numpy()
         pred_lst.extend(list(y_pred))
-    logerr.debug("Length of pred data: {}".format(len(pred_lst)))
+    logger.debug("Length of pred data: {}".format(len(pred_lst)))
 
     if args.save_output_dirc is not None:
         pd.save_csv("{0}/value_{1}.csv".format(args.save_output_dirc, learning_date), index=False)
