@@ -41,7 +41,7 @@ def leveled_labels(label_df):
     return label_arr
 
 
-def norm_labels(label_arr, kw=60):
+def norm_labels(label_arr, kw=60*10):
     time_width = label_arr.shape[0]
     norm_label_arr = np.zeros(time_width)
     x = np.linspace(0, time_width - 1, num=time_width)
