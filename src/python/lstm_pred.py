@@ -55,7 +55,7 @@ def predict(args):
     model = Predictor(args.input_dim, args.hidden_dim, args.num_layers,
                    args.output_dim, dropout_ratio=0)
     #model = nn.DataParallel(model)
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load(args.model_path))
     model = model.to(device)
     model.eval()
 
