@@ -73,7 +73,7 @@ def predict(args):
     logger.debug("Length of pred data: {}".format(len(pred_lst)))
 
     if args.save_output_dirc is not None:
-        pd.to_csv("{0}/value_{1}.csv".format(args.save_output_dirc, learning_date), index=False)
+        np.savetxt("{0}/value_{1}.csv".format(args.save_output_dirc, learning_date), np.array(pred_lst))
         fig_save_path = "{0}/fig_{1}.png".format(args.save_output_dirc, learning_date)
         plot_pred(np.array(pred_lst), y_test, args.n_prev, args.pred_point, fig_save_path)
         logger.debug("Save figure in {0}".format(fig_save_path))
