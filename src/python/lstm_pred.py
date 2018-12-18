@@ -38,7 +38,7 @@ def predict(args):
     y_train = train_df["label"].as_matrix()
     X_train = train_df.as_matrix()
 
-    tets_df = pd.read_csv(args.test_path)
+    test_df = pd.read_csv(args.test_path)
     y_test = test_df["label"].as_matrix()
     X_test = test_df.as_matrix()
 
