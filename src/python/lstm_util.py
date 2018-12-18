@@ -104,7 +104,7 @@ def plot_pred(pred_arr, answer_arr, n_prev, pred_point, save_path):
 
     # plot data
     plt.plot(pred_arr, label="prediction")
-    plt.plot(amswer_arr, label="answer")
+    plt.plot(answer_arr, label="answer")
     plt.fill([0, n_prev+pred_point, n_prev+pred_point, 0], [0, 0, 5, 5], color="k", alpha=0.3, label="initial data")
     plt.xticks([i * 107900 / 30 for i in range(9)],
         ["9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"])
