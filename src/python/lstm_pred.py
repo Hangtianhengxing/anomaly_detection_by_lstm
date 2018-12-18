@@ -77,7 +77,7 @@ def predict(args):
         fig_save_path = "{0}/fig_{1}.png".format(args.save_output_dirc, learning_date)
         plot_pred(np.array(pred_lst), y_test, args.n_prev, args.pred_point, fig_save_path)
         logger.debug("Save figure in {0}".format(fig_save_path))
-        corr_save_path = "{0}/corr_{1}.png".format(args.save_putput_dirc, learning_date)
+        corr_save_path = "{0}/corr_{1}.png".format(args.save_output_dirc, learning_date)
         plot_corr(np.array(pred_lst), y_test, args.n_prev, args.pred_point, corr_save_path)
         logger.debug("Save Corr in {0}".format(corr_save_path))
 
