@@ -65,7 +65,7 @@ def predict(args):
 
     # prediction
     for test_idx in tqdm(range(test_n_batches)):
-        X = pred_batch_data(X_test, test_idx, batch_size, n_prev)
+        X = pred_batch_data(X_test, test_idx, args.batch_size, args.n_prev)
         X = to_variable(torch.Tensor(X))
         y_pred = model(X)[:, 0]
         y_pred = y_pred.cpu().data.numpy()
