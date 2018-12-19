@@ -20,7 +20,7 @@ from sklearn.preprocessing import MinMaxScaler
 from lstm_util import Predictor, to_variable, scale, pred_batch_data, plot_pred, plot_corr
 
 date = datetime.now()
-learning_date = "{0}{1}{2}_{3}{4}".format(
+learning_date = "{0:04d}{1:02d}{2:02d}_{3:2d}{4:02d}".format(
     date.year, date.month, date.day, date.hour, date.minute)
 
 logger = logging.getLogger(__name__)

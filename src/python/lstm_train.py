@@ -17,7 +17,7 @@ from torch.autograd import Variable
 from lstm_util import Predictor, to_variable, scale, batch_data
 
 date = datetime.now()
-learning_date = "{0}{1}{2}_{3}{4}".format(
+learning_date = "{0:04d}{1:02d}{2:02d}_{3:02d}{4:02d}".format(
     date.year, date.month, date.day, date.hour, date.minute)
 
 logger = logging.getLogger(__name__)
