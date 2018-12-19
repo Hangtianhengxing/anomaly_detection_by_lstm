@@ -21,7 +21,7 @@ learning_date = "{0:04d}{1:02d}{2:02d}_{3:02d}{4:02d}".format(
     date.year, date.month, date.day, date.hour, date.minute)
 
 logger = logging.getLogger(__name__)
-logs_path = "/home/sakka/cnn_anomaly_detection/logs/lstm_train_{}.log".format(learning_date)
+logs_path = "/home/sakka/cnn_anomaly_detection/logs/lstm_train_{0}.log".format(learning_date)
 logging.basicConfig(filename=logs_path,
                     level=logging.DEBUG,
                     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
@@ -39,14 +39,14 @@ def train(args):
 
     # train and val data applied MinMaxScaler 
     X_train, X_val, y_train, y_val, _, _ = scale(X_train, X_val, y_train, y_val)
-    logger.debug("X_train shape: {}".format(X_train.shape))
-    logger.debug("y_train shape: {}".format(y_train.shape))
-    logger.debug("X_val shape: {}".format(X_val.shape))
-    logger.debug("y_val shape: {}".format(y_val.shape))
+    logger.debug("X_train shape: {0}".format(X_train.shape))
+    logger.debug("y_train shape: {0}".format(y_train.shape))
+    logger.debug("X_val shape: {0}".format(X_val.shape))
+    logger.debug("y_val shape: {0}".format(y_val.shape))
 
     # define model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    logger.debug("DEVICE: {}".format(device))
+    logger.debug("DEVICE: {0}".format(device))
     model = Predictor(args.input_dim, args.hidden_dim, args.num_layers, args.output_dim, args.dropout_ratio)
     #model = nn.DataParallel(model).to(device)
     model = model.to(device)
@@ -113,7 +113,7 @@ def train(args):
             best_epoch = epoch+1
             torch.save(model.state_dict(), save_model_path)
 
-        logger.debug("EPOCH: {}, TRAIN LOSS: {}, VAL LOSS: {}, EARLY STOPPING: {}/{}".format(
+        logger.debug("EPOCH: {0}, TRAIN LOSS: {1}, VAL LOSS: {2}, EARLY STOPPING: {3}/{4}".format(
                     epoch + 1, 
                     train_loss_lst[-1], 
                     val_loss_lst[-1],

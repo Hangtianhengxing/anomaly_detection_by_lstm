@@ -44,12 +44,12 @@ def predict(args):
 
     # train and val data applied MinMaxScaler
     _, X_test, _, y_test, X_sclr, y_sclr = scale(X_train, X_test, y_train, y_test)
-    logger.debug("X_test shape: {}".format(X_test.shape))
-    logger.debug("y_test shape: {}".format(y_test.shape))
+    logger.debug("X_test shape: {0}".format(X_test.shape))
+    logger.debug("y_test shape: {0}".format(y_test.shape))
 
     # device setting
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    logger.debug("DEVICE: {}".format(device))
+    logger.debug("DEVICE: {0}".format(device))
 
     # model setting
     model = Predictor(args.input_dim, args.hidden_dim, args.num_layers,
