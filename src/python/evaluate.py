@@ -6,15 +6,6 @@ import numpy as np
 import pandas as pd
 import logging
 
-from lstm_util import plot_metrics
-
-
-logger = logging.getLogger(__name__)
-logs_path = "../../logs/evaluate.log"
-logging.basicConfig(filename=logs_path,
-                    level=logging.DEBUG,
-                    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
-
 
 def eval_metrics(tp_cnt, fp_cnt, fn_cnt):
     if (tp_cnt+fp_cnt+fn_cnt) != 0:
@@ -37,10 +28,10 @@ def eval_metrics(tp_cnt, fp_cnt, fn_cnt):
     else:
         f_measure = 0
 
-    logger.debug("Accuracy: {0}".format(accuracy))
-    logger.debug("Precision: {0}".format(precision))
-    logger.debug("Recall: {0}".format(recall))
-    logger.debug("F-measure: {0}".format(f_measure))
+    # logger.debug("Accuracy  : {0}".format(accuracy))
+    # logger.debug("Precision : {0}".format(precision))
+    # logger.debug("Recall    : {0}".format(recall))
+    # logger.debug("F-measure : {0}".format(f_measure))
 
     return accuracy, precision, recall, f_measure
 
@@ -52,22 +43,24 @@ def evaluate(pred_arr, bin_ans_arr, pred_point, invalid_time, thresh):
 
     pred_idx = np.where(valid_pred_arr > thresh)[0]
     tp_cnt, fp_cnt = 0, 0
-    for i in pred_idx:
-        if np.sum(valid_bin_arr[i:i + pred_point]) > 0:
+    for end_idx in pred_idx:
+        start_idx = max(0, end_idx-pred_point)
+        if np.sum(valid_bin_arr[start_idx:end_idx]) > 0:
             tp_cnt += 1
         else:
             fp_cnt += 1
 
     ans_idx = np.where(valid_bin_arr == 1)[0]
     fn_cnt = 0
-    for i in ans_idx:
-        detect = np.where((i - pred_point < pred_idx) & (pred_idx < i))[0]
+    for end_idx in ans_idx:
+        start_idx = max(0, end_idx-pred_point)
+        detect = np.where((start_idx <= pred_idx) & (pred_idx <= end_idx))[0]
         if len(detect) == 0:
             fn_cnt += 1
 
-    logger.debug("TP: {0}".format(tp_cnt))
-    logger.debug("FP: {0}".format(fp_cnt))
-    logger.debug("FN: {0}".format(fn_cnt))
+    # logger.debug("TP : {0}".format(tp_cnt))
+    # logger.debug("FP : {0}".format(fp_cnt))
+    # logger.debug("FN : {0}".format(fn_cnt))
 
     accuracy, precision, recall, f_measure = eval_metrics(
         tp_cnt, fp_cnt, fn_cnt)
@@ -76,6 +69,12 @@ def evaluate(pred_arr, bin_ans_arr, pred_point, invalid_time, thresh):
 
 
 if __name__ == "__main__":
+    logger = logging.getLogger(__name__)
+    logs_path = "../../logs/evaluate.log"
+    logging.basicConfig(filename=logs_path,
+                        level=logging.DEBUG,
+                        format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
+
     # prediction
     pred_path = "../../data/prediction/value_20181220_1207.csv"
     logger.debug("Prediction data path: \"{0}\"".format(pred_path))

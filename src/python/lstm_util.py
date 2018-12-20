@@ -139,13 +139,13 @@ def plot_corr(pred_arr, answer_arr, n_prev, pred_point, save_path, title_info="t
     plt.savefig(save_path)
 
 
-def plot_metrics(accuracy, precision, recall, f_measure,save_path):
+def plot_metrics(accuracy, precision, recall, f_measure, sample_size, save_path):
     plt.figure(figsize=(16, 16))
 
     plt.subplot(2, 2, 1)
     plt.rcParams["font.size"] = 14
     plt.plot(accuracy)
-    #plt.xticks([i for i in range(0, 10001, 1000)], [i / 10 for i in range(11)])
+    plt.xticks([i for i in range(0, sample_size+1, int(sample_size/10))], [i/10 for i in range(11)])
     plt.ylim(0, 1.0)
     plt.title("Accuracy at each threshold")
     plt.xlabel("Thresh")
@@ -156,7 +156,7 @@ def plot_metrics(accuracy, precision, recall, f_measure,save_path):
     plt.subplot(2, 2, 2)
     plt.rcParams["font.size"] = 14
     plt.plot(precision)
-    #plt.xticks([i for i in range(0, 10001, 1000)], [i / 10 for i in range(11)])
+    plt.xticks([i for i in range(0, sample_size+1, int(sample_size/10))], [i/10 for i in range(11)])
     plt.ylim(0, 1.0)
     plt.title("Precision at each threshold")
     plt.xlabel("Thresh")
@@ -167,7 +167,7 @@ def plot_metrics(accuracy, precision, recall, f_measure,save_path):
     plt.subplot(2, 2, 3)
     plt.rcParams["font.size"] = 14
     plt.plot(recall)
-    #plt.xticks([i for i in range(0, 10001, 1000)], [i / 10 for i in range(11)])
+    plt.xticks([i for i in range(0, sample_size+1, int(sample_size/10))], [i/10 for i in range(11)])
     plt.ylim(0, 1.0)
     plt.title("Pecall at each threshold")
     plt.xlabel("Thresh")
@@ -178,7 +178,7 @@ def plot_metrics(accuracy, precision, recall, f_measure,save_path):
     plt.subplot(2, 2, 4)
     plt.rcParams["font.size"] = 14
     plt.plot(f_measure)
-    #plt.xticks([i for i in range(0, 10001, 1000)], [i / 10 for i in range(11)])
+    plt.xticks([i for i in range(0, sample_size+1, int(sample_size/10))], [i/10 for i in range(11)])
     plt.ylim(0, 1.0)
     plt.title("F-measure at each threshold")
     plt.xlabel("Thresh")
@@ -189,11 +189,10 @@ def plot_metrics(accuracy, precision, recall, f_measure,save_path):
     plt.savefig(save_path)
 
 
-def plot_rec2prec(rec_lst, prec_lst, f_lst, save_path):
+def plot_rec2prec(rec_lst, prec_lst, best_idx, save_path):
     plt.figure(figsize=(8, 8))
     plt.scatter(rec_lst, prec_lst, marker="o", s=15, alpha=0.5, edgecolors="b")
-    max_idx = np.argmax(f_lst)
-    plt.scatter(rec_lst[max_idx], prec_lst[max_idx], marker="*", s=100, color="r")
+    plt.scatter(rec_lst[best_idx], prec_lst[best_idx], marker="*", s=100, color="r")
     plt.xlim(0, 1.05)
     plt.ylim(0, 1.05)
     plt.title("Comparison")
