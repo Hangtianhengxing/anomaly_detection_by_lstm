@@ -98,7 +98,7 @@ def pred_batch_data(X, idx, batch_size, n_prev=60*30):
     return X_lst
 
 
-def plot_pred(pred_arr, answer_arr, n_prev, pred_point, save_path):
+def plot_pred(pred_arr, answer_arr, n_prev, pred_point, save_path, title_info="test"):
     plt.figure(figsize=(12, 4))
     plt.rcParams["font.size"] = 14
 
@@ -113,7 +113,7 @@ def plot_pred(pred_arr, answer_arr, n_prev, pred_point, save_path):
     plt.xlim(0, len(pred_arr))
     plt.ylim(0.0, 1.0)
     plt.grid()
-    plt.title("Predcition of anomaly level by using LSTM")
+    plt.title("Predcition of anomaly level by using LSTM ({0})".format(title_info))
     plt.xlabel("time")
     plt.ylabel("anomaly level")
     plt.legend(loc="upper right")
@@ -121,7 +121,7 @@ def plot_pred(pred_arr, answer_arr, n_prev, pred_point, save_path):
     plt.savefig(save_path)
 
 
-def plot_corr(pred_arr, answer_arr, n_prev, pred_point, save_path):
+def plot_corr(pred_arr, answer_arr, n_prev, pred_point, save_path, title_info="test"):
     plt.figure(figsize=(8, 8))
     plt.rcParams["font.size"]=14
 
@@ -131,7 +131,7 @@ def plot_corr(pred_arr, answer_arr, n_prev, pred_point, save_path):
 
     plt.scatter(plt_ans, plt_pred, marker="o",
                 s=1, alpha=0.5, edgecolors="b")
-    plt.title("Correlation coefficients = {:.4f}".format(coef))
+    plt.title("Correlation coefficients = {0:.4f} ({1})".format(coef, title_info))
     plt.xlabel("answer")
     plt.ylabel("prediction")
     plt.grid()

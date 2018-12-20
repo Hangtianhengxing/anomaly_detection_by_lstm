@@ -70,15 +70,18 @@ def predict(args):
         y_pred = model(X)[:, 0]
         y_pred = y_pred.cpu().data.numpy()
         pred_lst.extend(list(y_pred))
-    logger.debug("Length of pred data: {}".format(len(pred_lst)))
+    logger.debug("Length of pred data: {0}".format(len(pred_lst)))
 
     if args.save_output_dirc is not None:
-        np.savetxt("{0}/value_{1}.csv".format(args.save_output_dirc, learning_date), np.array(pred_lst))
+        data_save_path = "{0}/value_{1}.csv".format(args.save_output_dirc, learning_date)
+        np.savetxt(data_save_path, np.array(pred_lst))
+        logger.debug("Save pred data in {0}".format(data_save_path))
         fig_save_path = "{0}/fig_{1}.png".format(args.save_output_dirc, learning_date)
-        plot_pred(np.array(pred_lst), y_test, args.n_prev, args.pred_point, fig_save_path)
+        plot_pred(np.array(pred_lst), y_test, args.n_prev, args.pred_point, fig_save_path, title_info="test")
         logger.debug("Save figure in {0}".format(fig_save_path))
+        # NEEDFIX: separate evaluation from prediction 
         corr_save_path = "{0}/corr_{1}.png".format(args.save_output_dirc, learning_date)
-        plot_corr(np.array(pred_lst), y_test, args.n_prev, args.pred_point, corr_save_path)
+        plot_corr(np.array(pred_lst), y_test, args.n_prev, args.pred_point, corr_save_path, title_info="test")
         logger.debug("Save Corr in {0}".format(corr_save_path))
 
 
