@@ -137,3 +137,67 @@ def plot_corr(pred_arr, answer_arr, n_prev, pred_point, save_path, title_info="t
     plt.grid()
 
     plt.savefig(save_path)
+
+
+def plot_metrics(accuracy, precision, recall, f_measure, sample_size, save_path):
+    plt.figure(figsize=(16, 16))
+
+    plt.subplot(2, 2, 1)
+    plt.rcParams["font.size"] = 14
+    plt.plot(accuracy)
+    plt.xticks([i for i in range(0, sample_size+1, int(sample_size/10))], [i/10 for i in range(11)])
+    plt.ylim(0, 1.0)
+    plt.title("Accuracy at each threshold")
+    plt.xlabel("Thresh")
+    plt.ylabel("Accuracy")
+    plt.ylim(0, 1.05)
+    plt.grid()
+
+    plt.subplot(2, 2, 2)
+    plt.rcParams["font.size"] = 14
+    plt.plot(precision)
+    plt.xticks([i for i in range(0, sample_size+1, int(sample_size/10))], [i/10 for i in range(11)])
+    plt.ylim(0, 1.0)
+    plt.title("Precision at each threshold")
+    plt.xlabel("Thresh")
+    plt.ylabel("Precision")
+    plt.ylim(0, 1.05)
+    plt.grid()
+
+    plt.subplot(2, 2, 3)
+    plt.rcParams["font.size"] = 14
+    plt.plot(recall)
+    plt.xticks([i for i in range(0, sample_size+1, int(sample_size/10))], [i/10 for i in range(11)])
+    plt.ylim(0, 1.0)
+    plt.title("Pecall at each threshold")
+    plt.xlabel("Thresh")
+    plt.ylabel("Pecall")
+    plt.ylim(0, 1.05)
+    plt.grid()
+
+    plt.subplot(2, 2, 4)
+    plt.rcParams["font.size"] = 14
+    plt.plot(f_measure)
+    plt.xticks([i for i in range(0, sample_size+1, int(sample_size/10))], [i/10 for i in range(11)])
+    plt.ylim(0, 1.0)
+    plt.title("F-measure at each threshold")
+    plt.xlabel("Thresh")
+    plt.ylabel("F-measure")
+    plt.ylim(0, 1.05)
+    plt.grid()
+
+    plt.savefig(save_path)
+
+
+def plot_rec2prec(rec_lst, prec_lst, best_idx, save_path):
+    plt.figure(figsize=(8, 8))
+    plt.scatter(rec_lst, prec_lst, marker="o", s=15, alpha=0.5, edgecolors="b")
+    plt.scatter(rec_lst[best_idx], prec_lst[best_idx], marker="*", s=100, color="r")
+    plt.xlim(0, 1.05)
+    plt.ylim(0, 1.05)
+    plt.title("Comparison")
+    plt.xlabel("Recall")
+    plt.ylabel("Precision")
+    plt.grid()
+
+    plt.savefig(save_path)
