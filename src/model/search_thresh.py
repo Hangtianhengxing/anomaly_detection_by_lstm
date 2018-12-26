@@ -33,12 +33,12 @@ def search_thresh(pred_arr, bin_arr, pred_point, invalid_time, save_dirc, sample
         rec_lst.append(recall)
         f_lst.append(f_measure)
 
-    fig_save_path = "{0}/metrics.png".format(save_dirc)
+    fig_save_path = "{0}/metrics_600.png".format(save_dirc)
     plot_metrics(acc_lst, pre_lst, rec_lst, f_lst, sample_size, fig_save_path)
     logger.debug("Save figure of metrics result in \"{0}\"".format(fig_save_path))
 
     best_idx = np.argmax(f_lst)
-    rec2prec_save_path = "{0}/rec2prec.png".format(save_dirc)
+    rec2prec_save_path = "{0}/rec2prec_600.png".format(save_dirc)
     plot_rec2prec(rec_lst, pre_lst, best_idx, rec2prec_save_path)
     logger.debug("Save figure of recall vs precision in \"{0}\"".format(rec2prec_save_path))
 
@@ -66,6 +66,8 @@ if __name__ == "__main__":
     n_prev = 60*30
     pred_point = 60*10
     invalid_time = n_prev+pred_point
+    valid_time = 60*10
+    logger.debug("n_prev: {0}, pred_point: {1}, invalid_time: {2}, valid_time: {3}".format(n_prev, pred_point, invalid_time, valid_time))
     save_dirc = "../../data/prediction"
-    search_thresh(pred_arr, bin_arr, pred_point, invalid_time, save_dirc, sample_size=10000)
+    search_thresh(pred_arr, bin_arr, valid_time, invalid_time, save_dirc, sample_size=10000)
 
