@@ -40,6 +40,16 @@ def leveled_labels(label_df):
     label_arr[flag_idx] = 5
     return label_arr
 
+def get_init_acc(label_arr, width=60*10):
+    init_label_lst = []
+    for i in range(len(label_arr)):
+        start_idx = max(0, i - width)
+        if (np.sum(label_arr[start_idx:i]) == 0) & (label_arr[i] == 1):
+            init_label_lst.append(1)
+        else:
+            init_label_lst.append(0)
+
+    return np.array(init_label_lst)
 
 def norm_labels(label_arr, kw=60*10):
     time_width = label_arr.shape[0]
@@ -130,7 +140,7 @@ def make_datasets(args):
             else:
                 time_series_df[cur_day] = 0
 
-        #select row for every interva:
+        #select row for every interval
         time_series_df = time_series_df.iloc[[i for i in range(0, len(time_series_df), args.interval)]]
 
         # shift feature
@@ -173,7 +183,9 @@ def make_datasets(args):
 
     # label is normalized by pdf
     if args.normalize:
-        dataset_df["label"] = norm_labels(np.array(dataset_df["label"]))
+        # only capture initial acceleration
+        init_label_arr = get_init_acc(np.array(dataset_df["label"]))
+        dataset_df["label"] = norm_labels(init_label_arr)
 
     # check NaN count
     dataset_df = dataset_df.fillna(0)
@@ -181,7 +193,7 @@ def make_datasets(args):
 
     # save dataset
     if args.normalize:
-        save_path = "{0}/gaussian/{1}.csv".format(args.save_datasets_dirc, args.date)
+        save_path = "{0}/init_gaussian/{1}.csv".format(args.save_datasets_dirc, args.date)
     elif args.leveld:
         save_path = "{0}/leveled/{1}.csv".format(args.save_datasets_dirc, args.date)
     else:
@@ -201,8 +213,8 @@ def datasets_parse():
     )
 
     # Data Argument
-    parser.add_argument("--date", type=str, default="20170422")
-    parser.add_argument("--day", type=str, default="Sat",
+    parser.add_argument("--date", type=str, default="20181030")
+    parser.add_argument("--day", type=str, default="Tue",
                         help="select from [Sun, Mon, Tue, Wed, Thurs, Fri, Sat]")
     parser.add_argument("--col_name_path", type=str, 
                         default="/Users/sakka/cnn_anomaly_detection/data/datasets/datasets_col.csv")
