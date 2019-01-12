@@ -28,10 +28,10 @@ def eval_metrics(tp_cnt, fp_cnt, fn_cnt):
     else:
         f_measure = 0
 
-    # logger.debug("Accuracy  : {0}".format(accuracy))
-    # logger.debug("Precision : {0}".format(precision))
-    # logger.debug("Recall    : {0}".format(recall))
-    # logger.debug("F-measure : {0}".format(f_measure))
+    logger.debug("Accuracy  : {0}".format(accuracy))
+    logger.debug("Precision : {0}".format(precision))
+    logger.debug("Recall    : {0}".format(recall))
+    logger.debug("F-measure : {0}".format(f_measure))
 
     return accuracy, precision, recall, f_measure
 
@@ -43,8 +43,8 @@ def evaluate(pred_arr, bin_ans_arr, pred_point, invalid_time, thresh):
 
     pred_idx = np.where(valid_pred_arr > thresh)[0]
     tp_cnt, fp_cnt = 0, 0
-    for end_idx in pred_idx:
-        start_idx = max(0, end_idx-pred_point)
+    for start_idx in pred_idx:
+        end_idx = min(len(pred_arr), start_idx+pred_point)
         if np.sum(valid_bin_arr[start_idx:end_idx]) > 0:
             tp_cnt += 1
         else:
@@ -58,9 +58,9 @@ def evaluate(pred_arr, bin_ans_arr, pred_point, invalid_time, thresh):
         if len(detect) == 0:
             fn_cnt += 1
 
-    # logger.debug("TP : {0}".format(tp_cnt))
-    # logger.debug("FP : {0}".format(fp_cnt))
-    # logger.debug("FN : {0}".format(fn_cnt))
+    logger.debug("TP : {0}".format(tp_cnt))
+    logger.debug("FP : {0}".format(fp_cnt))
+    logger.debug("FN : {0}".format(fn_cnt))
 
     accuracy, precision, recall, f_measure = eval_metrics(
         tp_cnt, fp_cnt, fn_cnt)
@@ -70,13 +70,14 @@ def evaluate(pred_arr, bin_ans_arr, pred_point, invalid_time, thresh):
 
 if __name__ == "__main__":
     logger = logging.getLogger(__name__)
-    logs_path = "../../logs/evaluate.log"
+    logs_path = "../../logs/evaluate_control.log"
     logging.basicConfig(filename=logs_path,
                         level=logging.DEBUG,
                         format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 
     # prediction
-    pred_path = "../../data/prediction/value_20181220_1207.csv"
+    pred_path = "../../data/prediction/default/value_20190107_244.csv"
+    #pred_path = "../../data/prediction/default/control_evening.csv"
     logger.debug("Prediction data path: \"{0}\"".format(pred_path))
     pred_arr = np.loadtxt(pred_path)
 
