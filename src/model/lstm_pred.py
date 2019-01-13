@@ -61,7 +61,8 @@ def predict(args):
 
     # initialize
     test_n_batches = int(X_test.shape[0]/args.batch_size)
-    pred_lst = [0 for _ in range(args.batch_size+args.pred_point-1)]
+    #pred_lst = [0 for _ in range(args.batch_size+args.pred_point-1)]
+    pred_lst = [0 for _ in range(args.batch_size-1)]
 
     # prediction
     for test_idx in tqdm(range(test_n_batches)):
@@ -71,6 +72,7 @@ def predict(args):
         y_pred = y_pred.cpu().data.numpy()
         pred_lst.extend(list(y_pred))
     logger.debug("Length of pred data: {0}".format(len(pred_lst)))
+    pred_lst.extend([0 for _ in range(args.pred_point)])
 
     if args.save_output_dirc is not None:
         data_save_path = "{0}/value_{1}.csv".format(args.save_output_dirc, learning_date)
@@ -80,6 +82,11 @@ def predict(args):
         plot_pred(np.array(pred_lst), y_test, args.n_prev, args.pred_point, fig_save_path, title_info="test")
         logger.debug("Save figure in {0}".format(fig_save_path))
         # NEEDFIX: separate evaluation from prediction 
+        skip = args.batch_size+args.pred_point-1
+        pred_lst = pred_lst[skip:-args.pred_point]
+        y_test = y_test[-len(pred_lst):]
+        print(len(pred_lst))
+        print(len(y_test))
         corr_save_path = "{0}/corr_{1}.png".format(args.save_output_dirc, learning_date)
         plot_corr(np.array(pred_lst), y_test, args.n_prev, args.pred_point, corr_save_path, title_info="test")
         logger.debug("Save Corr in {0}".format(corr_save_path))

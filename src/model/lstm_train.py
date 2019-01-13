@@ -138,16 +138,16 @@ def make_train_parse():
 
     # Data Argument
     parser.add_argument("--train_path", type=str,
-                        default="/home/sakka/cnn_anomaly_detection/data/datasets/train_gaus.csv")
+                        default="/home/sakka/cnn_anomaly_detection/data/datasets/drop_col/train_drop_human.csv")
     parser.add_argument("--val_path", type=str,
-                        default="/home/sakka/cnn_anomaly_detection/data/datasets/val_gaus.csv")
+                        default="/home/sakka/cnn_anomaly_detection/data/datasets/drop_col/val_drop_human.csv")
     parser.add_argument("--save_model_dirc", type=str,
                         default="/home/sakka/cnn_anomaly_detection/data/model")
 
     # Parameter Argument
     parser.add_argument("--num_epochs", type=int, default=100)
-    parser.add_argument("--input_dim", type=int, default=67)
-    parser.add_argument("--hidden_dim", type=int, default=67)
+    parser.add_argument("--input_dim", type=int, default=66)
+    parser.add_argument("--hidden_dim", type=int, default=66)
     parser.add_argument("--num_layers", type=int, default=1)
     parser.add_argument("--dropout_ratio", type=int, default=0.5)
     parser.add_argument("--output_dim", type=float, default=1)
