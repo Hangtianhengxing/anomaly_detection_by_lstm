@@ -99,23 +99,23 @@ def pred_batch_data(X, idx, batch_size, n_prev=60*30):
 
 
 def plot_pred(pred_arr, answer_arr, n_prev, pred_point, save_path, title_info="test"):
-    plt.figure(figsize=(12, 4))
+    plt.figure(figsize=(16, 4))
     plt.rcParams["font.size"] = 14
 
     # plot data
-    plt.plot(pred_arr, label="prediction")
-    plt.plot(answer_arr, label="answer")
-    plt.fill([0, n_prev+pred_point, n_prev+pred_point, 0], [0, 0, 5, 5], color="k", alpha=0.3, label="initial data")
+    plt.plot(pred_arr*100, label="prediction")
+    plt.plot(answer_arr*100, label="answer")
+    plt.fill([0, n_prev, n_prev, 0], [0, 0, 100, 100], color="k", alpha=0.3, label="initial data")
     plt.xticks([i * 107900 / 30 for i in range(9)],
         ["9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"])
 
     # graph setting
     plt.xlim(0, len(pred_arr))
-    plt.ylim(0.0, 1.0)
+    plt.ylim(0.0, 100)
     plt.grid()
     plt.title("Predcition of anomaly level by using LSTM ({0})".format(title_info))
-    plt.xlabel("time")
-    plt.ylabel("anomaly level")
+    plt.xlabel("time [sec]")
+    plt.ylabel("probability of acceleration [%]")
     plt.legend(loc="upper right")
 
     plt.savefig(save_path)
