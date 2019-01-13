@@ -125,8 +125,10 @@ def plot_corr(pred_arr, answer_arr, n_prev, pred_point, save_path, title_info="t
     plt.figure(figsize=(8, 8))
     plt.rcParams["font.size"]=14
 
-    plt_pred = pred_arr[n_prev+pred_point:-pred_point+1]
-    plt_ans = answer_arr[n_prev+pred_point:]
+    #plt_pred = pred_arr[n_prev+pred_point:-pred_point+1]
+    #plt_ans = answer_arr[n_prev+pred_point:]
+    plt_ans = answer_arr
+    plt_pred = pred_arr
     coef = np.corrcoef(np.array([plt_ans, plt_pred]))[0][1]
 
     plt.scatter(plt_ans, plt_pred, marker="o",
