@@ -3,7 +3,7 @@
 
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+from tqdm import trange
 import logging
 import argparse
 import gc
@@ -72,7 +72,7 @@ def train(args):
         train_loss = 0.0
         val_loss = 0.0
         model.train()
-        for train_idx in tqdm(range(train_n_batches)):
+        for train_idx in trange(train_n_batches, desc="training data"):
             optimizer.zero_grad()
             X, y = batch_data(X_train, y_train, train_idx, args.batch_size, n_prev=args.n_pred, pred_point=args.pred_point)
             X = to_variable(torch.Tensor(X))
@@ -89,7 +89,7 @@ def train(args):
         train_loss_lst.append(train_loss)
             
         model.eval()
-        for val_idx in tqdm(range(val_n_batches)):
+        for val_idx in trange(val_n_batches, desc="validation data"):
             X, y = batch_data(X_val, y_val, val_idx, args.batch_size, n_prev=args.n_pred, pred_point=args.pred_point)
             X = to_variable(torch.Tensor(X))
             y = to_variable(torch.Tensor(y))
